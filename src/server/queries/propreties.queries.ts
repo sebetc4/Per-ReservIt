@@ -1,7 +1,7 @@
 import { HydratedDocument, ObjectId } from 'mongoose';
 import { NextApiRequest } from 'next';
 import { HttpErrors } from '../../types/api.types';
-import { IPropertyModel } from '../../types/models.types';
+import { IPropertySchema, PropertyPreview } from '../../types/properties.types';
 import { propertiesPerPage } from '../../utils/constants.utils';
 import { Property } from '../models/Property.model';
 
@@ -29,7 +29,11 @@ export const findAllPropertiesQuery = async (req: NextApiRequest) => {
         }
     });
     const propertiesCount = await Property.find({ ...locationParams, ...filters }).count();
-    const properties: HydratedDocument<IPropertyModel>[] | [] = await Property.find({ ...locationParams, ...filters })
+    const projection: (keyof PropertyPreview)[] = ['type', 'name', 'description', 'city', 'rating', 'images'];
+    const properties: HydratedDocument<IPropertySchema>[] | [] = await Property.find(
+        { ...locationParams, ...filters },
+        projection
+    )
         .limit(propertiesPerPage)
         .skip(propertiesPerPage * (currentPage - 1));
 
@@ -40,7 +44,7 @@ export const findAllPropertiesQuery = async (req: NextApiRequest) => {
 };
 
 export const findPropertyByIdQuery = async (id: ObjectId) => {
-    const property: HydratedDocument<IPropertyModel> | null = await Property.findById(id);
+    const property: HydratedDocument<IPropertySchema> | null = await Property.findById(id);
     if (!property) {
         throw HttpErrors.NOT_FOUND;
     }
@@ -48,7 +52,7 @@ export const findPropertyByIdQuery = async (id: ObjectId) => {
 };
 
 export const updatePropertyQuery = async (id: ObjectId, data: {}) => {
-    const updateProperty: HydratedDocument<IPropertyModel> | null = await Property.findByIdAndUpdate(id, data, {
+    const updateProperty: HydratedDocument<IPropertySchema> | null = await Property.findByIdAndUpdate(id, data, {
         new: true,
         runValidators: true,
     });
@@ -59,7 +63,7 @@ export const updatePropertyQuery = async (id: ObjectId, data: {}) => {
 };
 
 export const deletePropertyQuery = async (id: ObjectId) => {
-    const deletedProperty: HydratedDocument<IPropertyModel> | null = await Property.findByIdAndDelete(id);
+    const deletedProperty: HydratedDocument<IPropertySchema> | null = await Property.findByIdAndDelete(id);
     if (!deletedProperty) {
         throw HttpErrors.NOT_FOUND;
     }

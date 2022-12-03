@@ -1,10 +1,11 @@
-import { Document, ObjectId } from 'mongoose';
+import { Document, HydratedDocument, ObjectId, SchemaTimestampsConfig } from 'mongoose';
+
+type ModelType<IShema> = HydratedDocument<IShema> & SchemaTimestampsConfig;
 
 interface IImageProperty {
-    public_id: true;
-    url: true;
+    public_id: string;
+    url: string;
 }
-
 
 interface IAccommodation {
     quantity: number;
@@ -18,8 +19,6 @@ interface IAccommodation {
     airConditionned?: boolean;
 }
 
-export type AccommodationKeys = keyof IAccommodation
-
 interface IReviewProperty {
     user: ObjectId;
     name: string;
@@ -27,21 +26,28 @@ interface IReviewProperty {
     comment: string;
 }
 
-export interface IPropertyModel extends Document {
+export interface IPropertySchema extends Document {
     name: string;
-    type: 'hotel' | 'hostel' | 'guest house' | 'apartement';
+    type: 'hotel' | 'hostel' | 'guest house' | 'house' | 'apartement';
     description: string;
     address: string;
     city: string;
-    postcode: string
+    postcode: string;
     accommodation: IAccommodation[];
     internet?: boolean;
     breakfast?: boolean;
     petsAllowed?: boolean;
     roomCleaning?: boolean;
-    ratings?: number;
+    rating?: number;
     numbOfReview?: number;
     reviews: IReviewProperty[];
     images: IImageProperty[];
     user: ObjectId;
 }
+
+export type PropertyType = ModelType<IPropertySchema>;
+
+export type PropertyPreview = Pick<
+    PropertyType,
+    '_id' | 'name' | 'type' | 'description' | 'city' | 'rating' | 'images'
+>;

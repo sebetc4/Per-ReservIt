@@ -1,8 +1,14 @@
-import Head from 'next/head'
-import Image from 'next/image'
+import { HomeComponent } from '../client/layout';
+import { wrapper } from '../store/store';
+import { fetchAllProperties } from '../store/slices/properties.slice';
 
 export default function Home() {
-  return (
-    <div>Mon App</div>
-  )
+
+    return <HomeComponent />;
 }
+export const getServerSideProps = wrapper.getServerSideProps((store) => async ({ params }) => {
+    await store.dispatch(fetchAllProperties());
+    return {
+        props: {},
+    };
+});

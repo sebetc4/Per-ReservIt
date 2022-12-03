@@ -1,7 +1,7 @@
 import mongoose, { Schema, model, models } from 'mongoose';
-import { IPropertyModel } from '../../types/models.types';
+import { IPropertySchema } from '../../types/properties.types';
 
-const PropertySchema = new Schema<IPropertyModel>(
+const PropertySchema = new Schema<IPropertySchema>(
     {
         name: {
             type: String,
@@ -94,7 +94,7 @@ const PropertySchema = new Schema<IPropertyModel>(
             type: Boolean,
             default: false,
         },
-        ratings: {
+        rating: {
             type: Number,
             default: 0,
         },
@@ -146,4 +146,6 @@ const PropertySchema = new Schema<IPropertyModel>(
     }
 );
 
-export const Property = models.Property || model<IPropertyModel>('Property', PropertySchema);
+export const Property = models.Property || model<IPropertySchema>('Property', PropertySchema);
+
+
