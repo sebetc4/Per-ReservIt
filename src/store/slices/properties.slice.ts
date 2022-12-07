@@ -38,8 +38,8 @@ export const propertiesSlice = createSlice({
     },
 });
 
-export const fetchAllProperties = createAsyncThunk('properties/fetchAll', async () => {
-    const res = await Api.fetchAllProperties();
+export const fetchAllProperties = createAsyncThunk('properties/fetchAll', async (currentPage: number) => {
+    const res = await Api.fetchAllProperties(currentPage);
     return res.data;
 });
 

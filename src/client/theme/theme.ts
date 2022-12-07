@@ -10,10 +10,10 @@ export const commonTheme = {
 
 export const lightPalette: IColorTheme = {
     primary: {
-        main: '#5c6337',
+        main: '#001253',
     },    
     secondary: {
-        main: '#946E38',
+        main: '#FD841F',
     },
 };
 

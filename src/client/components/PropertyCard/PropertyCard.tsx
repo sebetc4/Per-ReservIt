@@ -11,11 +11,11 @@ interface IPropertyCardProps {
 }
 
 export default function PropertyItem({ property }: IPropertyCardProps) {
-    const { type, name, description, city, rating, images, _id } = property;
+    const { type, name, description, location, rating, images, _id } = property;
     return (
         <Link
             href={`/property/${_id}`}
-            style={{ textDecoration: 'none'  }}
+            style={{ textDecoration: 'none', width: '100%', maxWidth: '300px' }}
         >
             <Box
                 component='article'
@@ -23,21 +23,40 @@ export default function PropertyItem({ property }: IPropertyCardProps) {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    maxWidth: '300px',
-                    boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
-                    padding: 1,
-                    borderRadius: 2,
+                    boxShadow:
+                        '0 13px 27px -5px hsla(240, 30.1%, 28%, 0.25), 0 8px 16px -8px hsla(0, 0%, 0%, 0.3), 0 -6px 16px -6px hsla(0, 0%, 0%, 0.03)',
+                    borderRadius: 3,
                     cursor: 'pointer',
-                    color: 'text.primary'
+                    color: 'text.primary',
+                    overflow: 'hidden',
+                    transition: 'all 0.3s ease-in-out',
+                    '&:hover': {
+                        transform: 'scale(1.03)',
+                        boxShadow:
+                            '0 13px 40px -5px hsla(240, 30.1%, 28%, 0.12), 0 8px 32px -8px hsla(0, 0%, 0%, 0.14), 0 -6px 32px -6px hsla(0, 0%, 0%, 0.02)',
+                    },
                 }}
             >
-                <Image
-                    alt={name}
-                    width={200}
-                    height={200}
-                    src={images[0].url}
-                />
-                <Box>
+                <Box
+                    sx={{
+                        width: '100%',
+                        height: '200px',
+                        position: 'relative',
+                    }}
+                >
+                    <Image
+                        alt={name}
+                        fill
+                        src={images[0].url}
+                        style={{
+                            objectFit: 'cover',
+                        }}
+                    />
+                </Box>
+                <Box sx={{
+                    padding: 2,
+                    width: '100%',
+                }}>
                     <Typography
                         gutterBottom
                         variant='h5'
@@ -49,7 +68,7 @@ export default function PropertyItem({ property }: IPropertyCardProps) {
                         gutterBottom
                         variant='subtitle1'
                     >
-                        {`${propertyType[type]} à ${city}`}
+                        {`${propertyType[type]} à ${location.city}`}
                     </Typography>
                     <Typography
                         variant='body2'
@@ -68,6 +87,7 @@ export default function PropertyItem({ property }: IPropertyCardProps) {
                                 fontSize='inherit'
                             />
                         }
+                        sx={{mt: 1}}
                     />
                 </Box>
             </Box>

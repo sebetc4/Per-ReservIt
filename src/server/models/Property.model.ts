@@ -22,21 +22,23 @@ const PropertySchema = new Schema<IPropertySchema>(
             trim: true,
             maxLength: 500,
         },
-        address: {
-            type: String,
-            required: true,
-            trim: true,
+        location: {
+            address: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+            city: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+            postcode: {
+                type: String,
+                required: true,
+            },
         },
-        city: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-        postcode : {
-            type: String,
-            required: true,
-        },
-        accommodation: [
+        accommodations: [
             {
                 quantity: {
                     type: Number,
@@ -56,43 +58,57 @@ const PropertySchema = new Schema<IPropertySchema>(
                     type: Number,
                     required: true,
                 },
-                largeDoubleBed: {
-                    type: Number,
-                    default: 0,
+                beds: {
+                    largeDoubleBed: {
+                        type: Number,
+                        default: 0,
+                    },
+                    doubleBed: {
+                        type: Number,
+                        default: 0,
+                    },
+                    simpleBed: {
+                        type: Number,
+                        default: 0,
+                    },
+                    sofaBed: {
+                        type: Number,
+                        default: 0,
+                    },
                 },
-                doubleBed: {
-                    type: Number,
-                    default: 0,
-                },
-                simpleBed: {
-                    type: Number,
-                    default: 0,
-                },
-                sofaBed: {
-                    type: Number,
-                    default: 0,
-                },
-                airConditionned: {
-                    type: Boolean,
-                    default: false,
-                },
+                options: {
+                    airConditionned: {
+                        type: Boolean,
+                        default: false,
+                    },
+                    minibar: {
+                        type: Boolean,
+                        default: false,
+                    }
+                }
             },
         ],
-        internet: {
-            type: Boolean,
-            default: false,
-        },
-        breakfast: {
-            type: Boolean,
-            default: false,
-        },
-        petsAllowed: {
-            type: Boolean,
-            default: false,
-        },
-        roomCleaning: {
-            type: Boolean,
-            default: false,
+        facilities: {
+            carPark: {
+                type: Boolean,
+                default: false,
+            },
+            internet: {
+                type: Boolean,
+                default: false,
+            },
+            breakfast: {
+                type: Boolean,
+                default: false,
+            },
+            petsAllowed: {
+                type: Boolean,
+                default: false,
+            },
+            roomCleaning: {
+                type: Boolean,
+                default: false,
+            },
         },
         rating: {
             type: Number,
@@ -147,5 +163,3 @@ const PropertySchema = new Schema<IPropertySchema>(
 );
 
 export const Property = models.Property || model<IPropertySchema>('Property', PropertySchema);
-
-

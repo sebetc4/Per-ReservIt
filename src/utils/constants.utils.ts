@@ -1,6 +1,6 @@
 export const isDevEnv = process.env.NODE_ENV === 'development';
 
-export const propertiesPerPage = 10;
+export const propertiesPerPage = 12;
 
 export const propertyType = {
     hotel: 'Hôtel',

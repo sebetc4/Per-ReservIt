@@ -25,8 +25,8 @@ class ApiService {
         // );
     }
     // Properties
-    fetchAllProperties() {
-        return this.api.get('/properties');
+    fetchAllProperties(currentPage: number, ) {
+        return this.api.get(`/properties?page=${currentPage}`);
     }
     fetchProperty(id: string) {
         return this.api.get(`/properties/${id}`);

@@ -6,7 +6,7 @@ import { propertiesPerPage } from '../../utils/constants.utils';
 import { Property } from '../models/Property.model';
 
 export const findAllPropertiesQuery = async (req: NextApiRequest) => {
-    const allowedFilter: string[] = ['accommodation.pricePerNight'];
+    const allowedFilter: string[] = ['accommodations.pricePerNight'];
 
     const location = req.query.location;
     const filters = req.query;
@@ -29,7 +29,7 @@ export const findAllPropertiesQuery = async (req: NextApiRequest) => {
         }
     });
     const propertiesCount = await Property.find({ ...locationParams, ...filters }).count();
-    const projection: (keyof PropertyPreview)[] = ['type', 'name', 'description', 'city', 'rating', 'images'];
+    const projection: (keyof PropertyPreview)[] = ['type', 'name', 'description', 'location', 'rating', 'images'];
     const properties: HydratedDocument<IPropertySchema>[] | [] = await Property.find(
         { ...locationParams, ...filters },
         projection

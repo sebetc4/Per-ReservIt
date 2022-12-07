@@ -1,103 +1,186 @@
-import { Box, Container, Rating, Typography } from '@mui/material';
-import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperCore, { EffectFlip, Navigation, Pagination } from 'swiper';
-import { useAppSelector } from '../../hooks/redux.hooks';
-import StarIcon from '@mui/icons-material/Star';
-import Image from 'next/image';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import { PropertyType } from '../../../types/properties.types';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 
-SwiperCore.use([Pagination]);
+import { Box, Container, Rating, Typography, Grid, Divider, Button } from '@mui/material';
+import StarIcon from '@mui/icons-material/Star';
+
+import { useAppDispatch, useAppSelector } from '../../hooks/redux.hooks';
+import { FacilityItem, Accommodation, Carousel } from './components';
+import { KeysOfFacilities } from '../../../types/properties.types';
+import { setAlert } from '../../../store/slices/alert.slice';
+import { ObjectId } from 'mongoose';
 
 interface IProperty {}
 
 export default function Property({}: IProperty) {
+    // Hooks
+    const dispatch = useAppDispatch();
+
+    // Store
     const { error, data: property } = useAppSelector((state) => state.property);
 
-    const {
-        name,
-        type,
-        description,
-        address,
-        city,
-        postcode,
-        accommodation,
-        internet,
-        breakfast,
-        petsAllowed,
-        roomCleaning,
-        rating,
-        numbOfReview,
-        reviews,
-        images,
-        user,
-    } = property as PropertyType;
+    useEffect(() => {
+        error &&
+            dispatch(
+                setAlert({
+                    type: 'error',
+                    message: "Erreur lors de la récupération de l'hébergement. Merci d\'essayer ultérieurement.",
+                })
+            );
+    }, []);
 
+    // State
+    const [selectedAccommodation, setSelectedAccommodation] = useState<number>(0);
 
+    const handleChangeSelectedAccommodation = (e: ChangeEvent<HTMLInputElement>) => {
+        setSelectedAccommodation(+e.target.value);
+    };
+
+    const keysOfFacilities = property ? Object.keys(property.facilities) : null;
 
     return property ? (
         <Container
             component='main'
             maxWidth='xl'
+            sx={{
+                pt: 6,
+            }}
         >
-            <Typography
-                component='h1'
-                variant='h2'
+            <Grid
+                container
+                spacing={2}
             >
-                {property.name}
-            </Typography>
-            <Typography>{`${property.address}, ${property.city}, ${property.postcode}`}</Typography>
-            <Box sx={{ display: 'flex' }}>
-                <Rating
-                    name={`rating-${property.name}`}
-                    value={property.rating}
-                    readOnly
-                    precision={0.5}
-                    emptyIcon={
-                        <StarIcon
-                            style={{ opacity: 0.55 }}
-                            fontSize='inherit'
-                        />
-                    }
-                />
-                <Typography
+                {/* Informations */}
+                <Grid
+                    item
+                    xs={4}
+                >
+                    <Typography
+                        component='h1'
+                        variant='h2'
+                        sx={{
+                            mt: 2,
+                            mb: 2,
+                        }}
+                    >
+                        {property.name}
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography sx={{ mt: 1 }}>
+                            {`${property.location.address}, ${property.location.city}, ${property.location.postcode}`}
+                        </Typography>
+                        <Box sx={{ display: 'flex', mt: 1, mb: 1 }}>
+                            <Rating
+                                name={`rating-${property.name}`}
+                                value={property.rating}
+                                readOnly
+                                precision={0.5}
+                                emptyIcon={
+                                    <StarIcon
+                                        style={{ opacity: 0.55 }}
+                                        fontSize='inherit'
+                                    />
+                                }
+                            />
+                            <Typography
+                                sx={{
+                                    ml: 1,
+                                }}
+                            >
+                                ({property.numbOfReview} avis)
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Divider sx={{ mt: 1, mb: 1 }}>
+                        <Typography
+                            component='h2'
+                            sx={{
+                                px: 2,
+                                py: 2,
+                            }}
+                        >
+                            Description
+                        </Typography>
+                    </Divider>
+                    <Typography>{property.description}</Typography>
+                    <Divider sx={{ mt: 1, mb: 1 }}>
+                        <Typography
+                            component='h2'
+                            sx={{
+                                pl: 2,
+                                pr: 2,
+                            }}
+                        >
+                            Points forts
+                        </Typography>
+                    </Divider>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 2,
+                        }}
+                    >
+                        {Object.values(property.facilities).map(
+                            (facility, i) =>
+                                facility && <FacilityItem type={keysOfFacilities![i] as KeysOfFacilities} />
+                        )}
+                    </Box>
+                </Grid>
+
+                {/* Carousel */}
+                <Grid
+                    item
+                    xs={8}
                     sx={{
-                        ml: 1,
+                        display: 'flex',
+                        justifyContent: 'center',
                     }}
                 >
-                    ({property.numbOfReview} avis)
-                </Typography>
-            </Box>
-            <Box>
-                <Typography>{property.description}</Typography>
-            </Box>
-            <Swiper
-                spaceBetween={0}
-                slidesPerView={1}
-                speed={500}
-                loop={true}
-                touchRatio={1.5}
-                navigation={true}
-                pagination={{ clickable: true }}
-                className='mySwiper'
-                style={{
-                    maxWidth: '600px',
-                }}
-            >
-                {property.images.map((image) => (
-                    <SwiperSlide style={{}}>
-                        <Image
-                            src={image.url}
-                            alt={name}
-                            width={600}
-                            height={400}
+                    <Carousel
+                        name={property.name}
+                        images={property.images}
+                    />
+                </Grid>
+            </Grid>
+
+            {/* Accomodations */}
+            <Box sx={{ mt: 6 }}>
+                <Divider sx={{ mt: 1, mb: 1 }}>
+                    <Typography
+                        component='h2'
+                        sx={{
+                            pl: 2,
+                            pr: 2,
+                        }}
+                    >
+                        Types d'hébergement
+                    </Typography>
+                </Divider>
+                {property.accommodations.map((accommodation, i) => (
+                    <>
+                        <Accommodation
+                            accommodation={accommodation}
+                            index={i}
+                            selectedAccommodation={selectedAccommodation}
+                            handleChangeSelectedAccommodation={handleChangeSelectedAccommodation}
                         />
-                    </SwiperSlide>
+                        {i + 1 < property.accommodations.length && <Divider sx={{ mt: 2, mb: 2 }} />}
+                    </>
                 ))}
-            </Swiper>
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Button
+                        variant='outlined'
+                        color='secondary'
+                        sx={{
+                            mt: 6,
+                        }}
+                    >
+                        Réserver
+                    </Button>
+                </Box>
+            </Box>
         </Container>
-    ) : 
-    <>Loading</>;
+    ) : (
+        <>Loading</>
+    );
 }

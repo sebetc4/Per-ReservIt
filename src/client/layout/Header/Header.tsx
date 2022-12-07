@@ -33,6 +33,7 @@ export default function ResponsiveAppBar() {
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
     const [connected, setConnecter] = useState<boolean>(false);
 
+    // Handlers
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElNav(event.currentTarget);
 
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElUser(event.currentTarget);
@@ -195,12 +196,14 @@ export default function ResponsiveAppBar() {
                                 <Button
                                     sx={{ mr: 4 }}
                                     onClick={() => router.replace('/sign-up')}
+                                    color='secondary'
                                 >
                                     Inscription
                                 </Button>
                                 <Button
                                     variant='contained'
                                     onClick={() => router.replace('/sign-in')}
+                                    color='secondary'
                                 >
                                     Connexion
                                 </Button>

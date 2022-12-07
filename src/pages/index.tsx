@@ -6,8 +6,9 @@ export default function Home() {
 
     return <HomeComponent />;
 }
-export const getServerSideProps = wrapper.getServerSideProps((store) => async ({ params }) => {
-    await store.dispatch(fetchAllProperties());
+export const getServerSideProps = wrapper.getServerSideProps((store) => async ({ params, query }) => {
+    const currentPage = typeof query.page === 'string' ? +query.page : 1
+    await store.dispatch(fetchAllProperties(currentPage));
     return {
         props: {},
     };
