@@ -10,3 +10,5 @@ export { default as ProgressButton } from './buttons/ProgressButton/ProgressButt
 
 // property
 export { default as PropertyItem } from './PropertyCard/PropertyCard';
+
+export { default as Search } from './Search/Search';

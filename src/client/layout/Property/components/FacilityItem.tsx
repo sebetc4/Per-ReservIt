@@ -32,7 +32,7 @@ export default function FacilityItem({ type }: IFacilitieItemsProps) {
             <SvgIcon
                 component={Facility[type].icon}
                 inheritViewBox
-                color='primary'
+                color='secondary'
             />
             <Typography sx={{ ml: 1 }}>{Facility[type].text}</Typography>
         </Box>

@@ -1,13 +1,12 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
-import { Box, Container, Rating, Typography, Grid, Divider, Button } from '@mui/material';
+import { Box, Rating, Typography, Grid, Divider, Button } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 
 import { useAppDispatch, useAppSelector } from '../../hooks/redux.hooks';
-import { FacilityItem, Accommodation, Carousel } from './components';
+import { FacilityItem, Carousel, AccommodationItem } from './components';
 import { KeysOfFacilities } from '../../../types/properties.types';
 import { setAlert } from '../../../store/slices/alert.slice';
-import { ObjectId } from 'mongoose';
 
 interface IProperty {}
 
@@ -23,7 +22,7 @@ export default function Property({}: IProperty) {
             dispatch(
                 setAlert({
                     type: 'error',
-                    message: "Erreur lors de la récupération de l'hébergement. Merci d\'essayer ultérieurement.",
+                    message: "Erreur lors de la récupération de l'hébergement. Merci d'essayer ultérieurement.",
                 })
             );
     }, []);
@@ -38,13 +37,7 @@ export default function Property({}: IProperty) {
     const keysOfFacilities = property ? Object.keys(property.facilities) : null;
 
     return property ? (
-        <Container
-            component='main'
-            maxWidth='xl'
-            sx={{
-                pt: 6,
-            }}
-        >
+        <>
             <Grid
                 container
                 spacing={2}
@@ -122,7 +115,12 @@ export default function Property({}: IProperty) {
                     >
                         {Object.values(property.facilities).map(
                             (facility, i) =>
-                                facility && <FacilityItem type={keysOfFacilities![i] as KeysOfFacilities} />
+                                facility && (
+                                    <FacilityItem
+                                        key={`${keysOfFacilities![i]}-item`}
+                                        type={keysOfFacilities![i] as KeysOfFacilities}
+                                    />
+                                )
                         )}
                     </Box>
                 </Grid>
@@ -157,20 +155,19 @@ export default function Property({}: IProperty) {
                     </Typography>
                 </Divider>
                 {property.accommodations.map((accommodation, i) => (
-                    <>
-                        <Accommodation
+                    <Box key={accommodation.name}>
+                        <AccommodationItem
                             accommodation={accommodation}
                             index={i}
                             selectedAccommodation={selectedAccommodation}
                             handleChangeSelectedAccommodation={handleChangeSelectedAccommodation}
                         />
                         {i + 1 < property.accommodations.length && <Divider sx={{ mt: 2, mb: 2 }} />}
-                    </>
+                    </Box>
                 ))}
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Button
                         variant='outlined'
-                        color='secondary'
                         sx={{
                             mt: 6,
                         }}
@@ -179,7 +176,7 @@ export default function Property({}: IProperty) {
                     </Button>
                 </Box>
             </Box>
-        </Container>
+        </>
     ) : (
         <>Loading</>
     );

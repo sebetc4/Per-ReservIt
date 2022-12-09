@@ -33,8 +33,8 @@ export default function Carousel({ name, images }: ICarouselProps) {
                 className='mySwiper'
                 style={{ width: '100%', height: '100%' }}
             >
-                {images.map((image) => (
-                    <SwiperSlide style={{ width: '100%', height: '100%' }}>
+                {images.map((image, i) => (
+                    <SwiperSlide key={`${image.public_id}-${i}`} style={{ width: '100%', height: '100%' }}>
                         <Image
                             src={image.url}
                             alt={name}

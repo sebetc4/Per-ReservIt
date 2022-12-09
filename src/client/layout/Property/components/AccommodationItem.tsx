@@ -23,19 +23,19 @@ class Option {
     private constructor(public readonly text: string, public readonly icon: SvgIconComponent) {}
 }
 
-interface IAccommodationProps {
+interface IAccommodationItemProps {
     accommodation: IAccommodation;
     index: number;
     selectedAccommodation: number;
     handleChangeSelectedAccommodation: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function Accommodation({
+export default function AccommodationItem({
     accommodation,
     index,
     selectedAccommodation,
     handleChangeSelectedAccommodation,
-}: IAccommodationProps) {
+}: IAccommodationItemProps) {
     const keysOfBeds = Object.keys(accommodation.beds) as KeysOfBeds[];
     const keysOfOptions = Object.keys(accommodation.options) as KeysOfAccomodationOptions[];
 
@@ -60,6 +60,7 @@ export default function Accommodation({
                         (value, i) =>
                             value > 0 && (
                                 <BedItem
+                                    key={`${keysOfBeds[i]}-item`}
                                     bed={Bed[keysOfBeds[i]]}
                                     numb={value}
                                 />
@@ -72,7 +73,13 @@ export default function Accommodation({
                     sx={{ mt: 1, display: 'flex', gap: 2 }}
                 >
                     {Object.values(accommodation.options).map(
-                        (option, i) => option && <OptionItem option={Option[keysOfOptions[i]]} />
+                        (option, i) =>
+                            option && (
+                                <OptionItem
+                                    key={keysOfOptions[i]}
+                                    option={Option[keysOfOptions[i]]}
+                                />
+                            )
                     )}
                 </Grid>
                 <Grid
@@ -90,7 +97,7 @@ export default function Accommodation({
                             value={index}
                             name={`accommodation-${index + 1}-radio-button`}
                             inputProps={{ 'aria-label': accommodation.name }}
-                            color='secondary'
+                            color='primary'
                         />
                     </Box>
                 </Grid>
@@ -115,7 +122,7 @@ function BedItem({ bed, numb }: BedItemProps) {
             <SvgIcon
                 component={bed.icon}
                 inheritViewBox
-                color='primary'
+                color='secondary'
             />
             <Typography sx={{ ml: 1 }}>{bed.text}</Typography>
             <Typography sx={{ ml: 1 }}>{numb}</Typography>
@@ -138,7 +145,7 @@ function OptionItem({ option }: OptionItemProps) {
             <SvgIcon
                 component={option.icon}
                 inheritViewBox
-                color='primary'
+                color='secondary'
             />
             <Typography sx={{ ml: 1 }}>{option.text}</Typography>
         </Box>

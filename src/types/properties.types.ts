@@ -13,11 +13,11 @@ export interface IImageProperty {
     url: string;
 }
 
-export type KeysOfAccomodationOptions= keyof IAccommodationOptions
+export type KeysOfAccomodationOptions = keyof IAccommodationOptions;
 
 interface IAccommodationOptions {
     airConditionned?: boolean;
-    minibar?: boolean
+    minibar?: boolean;
 }
 
 export interface IAccommodation {
@@ -25,11 +25,11 @@ export interface IAccommodation {
     name: string;
     guestNumb: number;
     pricePerNight: number;
-    beds: IBeds
-    options: IAccommodationOptions
+    beds: IBeds;
+    options: IAccommodationOptions;
 }
 
-export type KeysOfBeds= keyof IBeds
+export type KeysOfBeds = keyof IBeds;
 
 interface IBeds {
     largeDoubleBed?: number;
@@ -38,9 +38,7 @@ interface IBeds {
     sofaBed?: number;
 }
 
-
-
-export type KeysOfFacilities = keyof IFacilities
+export type KeysOfFacilities = keyof IFacilities;
 
 interface IFacilities {
     carPark: boolean;
@@ -56,6 +54,8 @@ interface IReviewProperty {
     rating: number;
     comment: string;
 }
+
+export type KeysOfPropertyType = PropertyType['type'] | 'all';
 
 export interface IPropertySchema extends Document {
     name: string;
@@ -75,5 +75,5 @@ export type PropertyType = ModelType<IPropertySchema>;
 
 export type PropertyPreview = Pick<
     PropertyType,
-    '_id' | 'name' | 'type' | 'description' | 'location' | 'rating' | 'images'
->;
+    '_id' | 'name' | 'type' | 'description' | 'location' | 'rating' | 'images' | 'numbOfReview'
+> & { minPrice: number };

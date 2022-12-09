@@ -3,17 +3,17 @@ import { IColorTheme } from '../../types/theme.type';
 export const commonTheme = {
     typography: {
         logo: {
-            fontFamily: '"Charmonman", cursive',
+            fontFamily: '"Zen Dots", cursive',
         },
     },
 };
 
 export const lightPalette: IColorTheme = {
     primary: {
-        main: '#001253',
+        main: '#E14D2A',
     },    
     secondary: {
-        main: '#FD841F',
+        main: '#3E6D9C',
     },
 };
 

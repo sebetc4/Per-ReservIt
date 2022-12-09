@@ -37,7 +37,6 @@ export const propertySlice = createSlice({
 
 export const fetchProperty = createAsyncThunk('property/fetchOne', async (id: string) => {
     const res = await Api.fetchProperty(id);
-    console.log(res.data)
     return res.data;
 
 });

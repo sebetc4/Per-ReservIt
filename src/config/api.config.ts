@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from 'axios';
-import { ObjectId } from 'mongoose';
 
 class ApiService {
     api: AxiosInstance;
@@ -12,21 +11,17 @@ class ApiService {
                 'Content-type': 'application/json',
             },
         });
-        // this.api.interceptors.response.use(
-        //     (res: any) => {
-        //         return res;
-        //     },
-        //     (err: any) => {
-        //         if (err.response.data === 'Invalid token') {
-        //             console.log(err);
-        //         }
-        //         return Promise.reject(err);
-        //     }
-        // );
     }
     // Properties
-    fetchAllProperties(currentPage: number, ) {
-        return this.api.get(`/properties?page=${currentPage}`);
+    fetchAllProperties(currentPage: string, location: string | null, type: string, guests: string | null) {
+        let query = `/properties?page=${currentPage}&type=${type}`;
+        if (location) {
+            query = query.concat(`&location=${location}`);
+        }
+        if (guests) {
+            query = query.concat(`&guests=${guests}`);
+        }
+        return this.api.get(query);
     }
     fetchProperty(id: string) {
         return this.api.get(`/properties/${id}`);

@@ -14,6 +14,7 @@ export enum ResStatus {
 export class HttpErrors {
     static readonly INVALID_QUERY_ID = new HttpErrors('The query ID is invalid', 400);
     static readonly BAD_REQUEST = new HttpErrors('Invalid request', 400);
+    static readonly EMAIL_ALREADY_EXISTS = new HttpErrors('This email already exists', 400);
     static readonly NOT_FOUND = new HttpErrors('The requested resource could not be found', 404);
     static readonly METHOD_NOT_ALLOWED = new HttpErrors('This method is not allowed', 405);
     private constructor(public readonly message: string, public readonly statusCode: number) {}

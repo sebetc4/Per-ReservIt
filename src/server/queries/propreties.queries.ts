@@ -6,19 +6,19 @@ import { propertiesPerPage } from '../../utils/constants.utils';
 import { Property } from '../models/Property.model';
 
 export const findAllPropertiesQuery = async (req: NextApiRequest) => {
-    const allowedFilter: string[] = ['accommodations.pricePerNight'];
+    const allowedFilter: string[] = ['type', 'guests', 'accommodations.pricePerNight'];
 
-    const location = req.query.location;
-    const filters = req.query;
+    const filters: any = req.query;
     const currentPage = Number(req.query.page) || 1;
+    const location = req.query.location;
 
     const locationParams =
         typeof location === 'string' && location?.trim()
             ? {
                   $or: [
-                      { city: { $regex: location, $options: 'i' } },
-                      { address: { $regex: location, $options: 'i' } },
-                      { postcode: { $regex: location, $options: 'i' } },
+                      { 'location.city': { $regex: location, $options: 'i' } },
+                      { 'location.address': { $regex: location, $options: 'i' } },
+                      { 'location.postcode': { $regex: location, $options: 'i' } },
                   ],
               }
             : {};
@@ -27,9 +27,27 @@ export const findAllPropertiesQuery = async (req: NextApiRequest) => {
         if (!allowedFilter.includes(key)) {
             delete filters[key];
         }
+        if (key === 'type' && filters[key] === 'all') {
+            delete filters.type;
+        }
+        if (key === 'guests') {
+            filters['accommodations.guestNumb'] = Number(filters.guests);
+            delete filters.guests;
+        }
     });
-    const propertiesCount = await Property.find({ ...locationParams, ...filters }).count();
-    const projection: (keyof PropertyPreview)[] = ['type', 'name', 'description', 'location', 'rating', 'images'];
+
+    const options = { ...locationParams, ...filters };
+    const propertiesCount = await Property.find(options).count();
+    const projection: (keyof PropertyPreview | 'accommodations.pricePerNight')[] = [
+        'type',
+        'name',
+        'description',
+        'location',
+        'rating',
+        'images',
+        'numbOfReview',
+        'accommodations.pricePerNight',
+    ];
     const properties: HydratedDocument<IPropertySchema>[] | [] = await Property.find(
         { ...locationParams, ...filters },
         projection

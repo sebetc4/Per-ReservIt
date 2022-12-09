@@ -11,10 +11,9 @@ interface IPropertyCardProps {
 }
 
 export default function PropertyItem({ property }: IPropertyCardProps) {
-    const { type, name, description, location, rating, images, _id } = property;
     return (
         <Link
-            href={`/property/${_id}`}
+            href={`/property/${property._id}`}
             style={{ textDecoration: 'none', width: '100%', maxWidth: '300px' }}
         >
             <Box
@@ -45,50 +44,65 @@ export default function PropertyItem({ property }: IPropertyCardProps) {
                     }}
                 >
                     <Image
-                        alt={name}
+                        alt={property.name}
                         fill
-                        src={images[0].url}
+                        src={property.images[0].url}
                         style={{
                             objectFit: 'cover',
                         }}
                     />
                 </Box>
-                <Box sx={{
-                    padding: 2,
-                    width: '100%',
-                }}>
+                <Box
+                    sx={{
+                        padding: 2,
+                        width: '100%',
+                    }}
+                >
                     <Typography
                         gutterBottom
                         variant='h5'
                         component='h3'
                     >
-                        {name}
+                        {property.name}
                     </Typography>
                     <Typography
                         gutterBottom
                         variant='subtitle1'
                     >
-                        {`${propertyType[type]} à ${location.city}`}
+                        {`${propertyType[property.type]} à ${property.location.city}`}
                     </Typography>
                     <Typography
                         variant='body2'
                         color='text.secondary'
                     >
-                        {description}
+                        {property.description}
                     </Typography>
-                    <Rating
-                        name={`rating-${name}`}
-                        value={rating}
-                        readOnly
-                        precision={0.5}
-                        emptyIcon={
-                            <StarIcon
-                                style={{ opacity: 0.55 }}
-                                fontSize='inherit'
-                            />
-                        }
-                        sx={{mt: 1}}
-                    />
+                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+                        <Rating
+                            name={`rating-${property.name}`}
+                            value={property.rating}
+                            readOnly
+                            precision={0.5}
+                            emptyIcon={
+                                <StarIcon
+                                    style={{ opacity: 0.55 }}
+                                    fontSize='inherit'
+                                />
+                            }
+                        />
+                        <Typography
+                            color='text.secondary'
+                            sx={{ fontSize: '.9rem', ml: 1 }}
+                        >
+                            ({property.numbOfReview} avis)
+                        </Typography>
+                    </Box>
+                    <Typography
+                        color='text.secondary'
+                        sx={{ mt: 1 }}
+                    >
+                        À partir de {property.minPrice}€ / nuit
+                    </Typography>
                 </Box>
             </Box>
         </Link>

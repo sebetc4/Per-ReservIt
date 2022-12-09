@@ -11,7 +11,7 @@ interface IError {
 
 export default function onError(err: Error | HttpErrors, res: NextApiResponse) {
     const isInstanceOfError = err instanceof Error;
-    const statusCode = isInstanceOfError ? 500 : err.statusCode;
+    let statusCode = isInstanceOfError ? 500 : err.statusCode;
     const error: IError = {
         status: ResStatus.ERROR,
         message: !isDevEnv && err instanceof Error ? 'Internal server error' : err.message,
@@ -19,6 +19,9 @@ export default function onError(err: Error | HttpErrors, res: NextApiResponse) {
     if (isDevEnv && err instanceof Error) {
         error.error = err;
         error.stack = err.stack;
+    } else if (!isDevEnv && err instanceof Error && err.name === 'ValidationError') {
+        statusCode = 400
+        error.message = 'Invalid request'
     }
     res.status(statusCode).json(error);
 }
