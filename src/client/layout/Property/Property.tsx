@@ -11,6 +11,7 @@ import { setAlert } from '../../../store/slices/alert.slice';
 interface IProperty {}
 
 export default function Property({}: IProperty) {
+    
     // Hooks
     const dispatch = useAppDispatch();
 

@@ -1,6 +1,6 @@
 import { Schema, model, models } from 'mongoose';
-import bcrypt from 'bcrypt'
-import { IUserSchema } from '../../types/user.types';
+import bcrypt from 'bcrypt';
+import { IUserSchema, UserType } from '../../types/user.types';
 import { HttpErrors } from '../../types/api.types';
 
 const UserSchema = new Schema<IUserSchema>(
@@ -25,15 +25,21 @@ const UserSchema = new Schema<IUserSchema>(
     }
 );
 
-UserSchema.pre('validate', async function() {
-    const user = await User.findOne({email: this.email});
+UserSchema.pre('validate', async function () {
+    const user = await User.findOne({ email: this.email });
     if (user) {
-        throw HttpErrors.EMAIL_ALREADY_EXISTS
+        throw HttpErrors.EMAIL_ALREADY_EXISTS;
     }
 });
 
-UserSchema.pre('save', async function() {
-    this.password = await bcrypt.hash(this.password, 10)
+UserSchema.pre('save', async function () {
+    if (this.isModified('password')) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
 });
+
+UserSchema.methods.isValidPassword = async function (password: UserType['password']) {
+    return await bcrypt.compare(password, this.password)
+}
 
 export const User = models.User || model<IUserSchema>('User', UserSchema);

@@ -2,31 +2,31 @@ import { Box, FormControl, IconButton, InputLabel, NativeSelect, TextField, Typo
 import { useRouter } from 'next/router';
 import React, { SyntheticEvent, useRef } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
-import { KeysOfPropertyType, PropertyType } from '../../../types/properties.types';
-import { propertyType } from '../../../utils/constants.utils';
+import { KeysOfPropertyCategory, PropertyType } from '../../../types/properties.types';
+import { propertyCategories } from '../../../utils/constants.utils';
 
 interface ISearchProps {}
 
-const keysOfPropertyType = Object.keys(propertyType) as KeysOfPropertyType[];
+const keysOfPropertyCategory = Object.keys(propertyCategories) as KeysOfPropertyCategory[];
 
 export default function Search({}: ISearchProps) {
     // Hooks
     const router = useRouter();
     const locationRef = useRef<HTMLInputElement>(null);
     const guestsRef = useRef<HTMLInputElement>(null);
-    const typeRef = useRef<HTMLInputElement>(null);
+    const categoryRef = useRef<HTMLInputElement>(null);
 
     // State
     const initialLocation = typeof router.query.location === 'string' ? router.query.location : '';
     const initialGuests = typeof router.query.guests === 'string' ? router.query.guests : '2';
-    const initialType = typeof router.query.type === 'string' ? (router.query.type as PropertyType['type']) : 'all';
+    const initialCategory = typeof router.query.category === 'string' ? (router.query.category as PropertyType['category']) : 'all';
 
     // Handlers
     const handleSubmit = (e: SyntheticEvent) => {
         e.preventDefault();
         const query = locationRef.current?.value.trim()
-            ? `/?location=${locationRef.current?.value.trim()}&guests=${guestsRef.current?.value}&type=${
-                  typeRef.current?.value
+            ? `/?location=${locationRef.current?.value.trim()}&guests=${guestsRef.current?.value}&category=${
+                  categoryRef.current?.value
               }`
             : '/';
         router.replace(query);
@@ -60,20 +60,20 @@ export default function Search({}: ISearchProps) {
                     <FormControl>
                         <InputLabel
                             variant='standard'
-                            htmlFor='type-input'
+                            htmlFor='category-input'
                         >
                             Type d'hébergement
                         </InputLabel>
                         <NativeSelect
-                            inputRef={typeRef}
-                            defaultValue={initialType}
+                            inputRef={categoryRef}
+                            defaultValue={initialCategory}
                             inputProps={{
-                                name: 'type',
-                                id: 'type-input',
+                                name: 'category',
+                                id: 'category-input',
                             }}
                         >
-                            {keysOfPropertyType.map((type) => (
-                                <option key={`${type}-item`} value={type}>{propertyType[type]}</option>
+                            {keysOfPropertyCategory.map((category) => (
+                                <option key={`${category}-item`} value={category}>{propertyCategories[category]}</option>
                             ))}
                         </NativeSelect>
                     </FormControl>

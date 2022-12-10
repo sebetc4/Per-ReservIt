@@ -1,49 +1,46 @@
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { signIn } from 'next-auth/react';
 
 import { Box, Typography, Container, Grid } from '@mui/material';
+import Api from '../config/api.config';
 
-import { CustomPasswordInput, CustomTextField, ProgressButton } from '../../client/components';
-import { ISignInBody } from '../../types/request.types';
-import { signInSchema } from '../../utils/validationSchemas';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { ISignUpBody } from '../types/request.types';
+import { signUpSchema } from '../utils/validationSchemas';
+import { HttpErrors } from '../types/api.types';
+import { CustomError } from '../server/middlewares/errors.middleware';
+import { CustomPasswordInput, CustomTextField, ProgressButton } from '../client/components';
 
-export default function SignIn() {
+export default function SignUp() {
     // Hooks
-
     const router = useRouter();
     const {
         register,
         handleSubmit,
         formState: { isSubmitting, errors },
         setError,
-    } = useForm<ISignInBody>({
-        resolver: yupResolver(signInSchema),
+    } = useForm<ISignUpBody>({
+        resolver: yupResolver(signUpSchema),
         mode: 'onTouched',
     });
 
-    const onSubmit = async (data: ISignInBody) => {
-        const res = await signIn('credentials', { ...data, redirect: false });
-        if (!res?.error) {
-            router.replace('/');
-            return;
+    const onSubmit = async (data: ISignUpBody) => {
+        try {
+            await Api.signUp(data);
+            router.replace('/login');
+        } catch (err) {
+            if (err instanceof CustomError && err.message === HttpErrors.EMAIL_ALREADY_EXISTS.message) {
+                setError('email', { type: 'custom', message: 'Cette adresse e-mail est déjà liée à un compte' });
+            }
         }
-        // if (res?.error === ApiErrors.WRONG_EMAIL) {
-        //     setError('email', { type: 'custom', message: "Aucun compte n'est enregistré avec cette adresse e-mail" });
-        //     return;
-        // }
-        // if (res?.error === ApiErrors.WRONG_EMAIL) {
-        //     setError('password', { type: 'custom', message: 'Mot de passe invalide' });
-        // }
     };
 
     return (
         <>
             <Head>
-                <title>Connexion - RecipeApp</title>
+                <title>Inscription - RecipeApp</title>
             </Head>
             <Container
                 component='main'
@@ -62,7 +59,7 @@ export default function SignIn() {
                         margin: 1,
                     }}
                 >
-                    Connexion
+                    Créer un compte
                 </Typography>
                 <Typography
                     component='h2'
@@ -71,7 +68,7 @@ export default function SignIn() {
                         marginBottom: 4,
                     }}
                 >
-                    Heureux de vous retouver! Connectez-vous pour accéder à votre compte.
+                    Vous cherchez un hébergement ou vous avez un hébergement à proposer? Rejoignez notre communauté.
                 </Typography>
                 <Box
                     component='form'
@@ -87,6 +84,13 @@ export default function SignIn() {
                         spacing={3}
                     >
                         <CustomTextField
+                            name='username'
+                            label='Pseudo'
+                            type='text'
+                            register={register('username')}
+                            error={errors.username}
+                        />
+                        <CustomTextField
                             name='email'
                             label='Adresse e-mail'
                             type='email'
@@ -100,6 +104,7 @@ export default function SignIn() {
                             error={errors.password}
                         />
                     </Grid>
+
                     <ProgressButton
                         loading={isSubmitting}
                         type='submit'
@@ -110,7 +115,7 @@ export default function SignIn() {
                     </ProgressButton>
                 </Box>
                 <Typography>
-                    Vous n'avez pas de compte ? <Link href='/sign-up'>Inscrivez-vous</Link>
+                    Vous avez déjà un compte ? <Link href='/login'>Connectez-vous</Link>
                 </Typography>
             </Container>
         </>

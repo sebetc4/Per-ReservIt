@@ -9,11 +9,11 @@ const PropertySchema = new Schema<IPropertySchema>(
             trim: true,
             maxLength: 100,
         },
-        type: {
+        category: {
             type: String,
             required: true,
             enum: {
-                values: ['hotel', 'hostel', 'guest house', 'apartement'],
+                values: ['hotel', 'hostel', 'guest house', 'house', 'apartement'],
             },
         },
         description: {
@@ -48,13 +48,13 @@ const PropertySchema = new Schema<IPropertySchema>(
                     type: String,
                     required: true,
                 },
-                pricePerNight: {
+                price: {
                     type: Number,
                     required: true,
                     max: 9999,
                     default: 0.0,
                 },
-                guestNumb: {
+                guests: {
                     type: Number,
                     required: true,
                 },

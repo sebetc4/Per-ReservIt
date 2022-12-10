@@ -90,7 +90,7 @@ export default function AccommodationItem({
                     <Box
                         sx={{ width: '100%', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}
                     >
-                        <Typography>{accommodation.pricePerNight}€ / nuit</Typography>
+                        <Typography>{accommodation.price}€ / nuit</Typography>
                         <Radio
                             checked={selectedAccommodation === index}
                             onChange={handleChangeSelectedAccommodation}

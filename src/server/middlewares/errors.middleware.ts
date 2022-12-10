@@ -1,27 +1,40 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
 import { HttpErrors, ResStatus } from '../../types/api.types';
 import { isDevEnv } from '../../utils/constants.utils';
 
-interface IError {
-    status: ResStatus;
+export class CustomError {
+    status: ResStatus.ERROR;
     message: string;
     error?: Error;
     stack?: string;
+    
+    constructor(err: Error | HttpErrors) {
+        this.status = ResStatus.ERROR;
+        // Message
+        if (isDevEnv || !(err instanceof Error)) {
+            this.message = err.message;
+        } else if (err.name === 'ValidationError') {
+            this.message = 'Invalid request';
+        } else {
+            this.message = 'Internal server error';
+        }
+        // Dev infos
+        if (isDevEnv && err instanceof Error) {
+            this.error = err;
+            this.stack = err.stack;
+        }
+    }
 }
 
 export default function onError(err: Error | HttpErrors, res: NextApiResponse) {
-    const isInstanceOfError = err instanceof Error;
-    let statusCode = isInstanceOfError ? 500 : err.statusCode;
-    const error: IError = {
-        status: ResStatus.ERROR,
-        message: !isDevEnv && err instanceof Error ? 'Internal server error' : err.message,
-    };
-    if (isDevEnv && err instanceof Error) {
-        error.error = err;
-        error.stack = err.stack;
-    } else if (!isDevEnv && err instanceof Error && err.name === 'ValidationError') {
+    const error = new CustomError(err);
+    let statusCode: number
+    if (!(err instanceof Error)) {
+        statusCode = err.statusCode;
+    } else if (err.name === 'ValidationError'){
         statusCode = 400
-        error.message = 'Invalid request'
+    } else {
+        statusCode = 500
     }
     res.status(statusCode).json(error);
 }

@@ -6,7 +6,7 @@ import { propertiesPerPage } from '../../utils/constants.utils';
 import { Property } from '../models/Property.model';
 
 export const findAllPropertiesQuery = async (req: NextApiRequest) => {
-    const allowedFilter: string[] = ['type', 'guests', 'accommodations.pricePerNight'];
+    const allowedFilter: string[] = ['category', 'guests', 'accommodations.price'];
 
     const filters: any = req.query;
     const currentPage = Number(req.query.page) || 1;
@@ -27,26 +27,26 @@ export const findAllPropertiesQuery = async (req: NextApiRequest) => {
         if (!allowedFilter.includes(key)) {
             delete filters[key];
         }
-        if (key === 'type' && filters[key] === 'all') {
-            delete filters.type;
+        if (key === 'category' && filters[key] === 'all') {
+            delete filters.category;
         }
         if (key === 'guests') {
-            filters['accommodations.guestNumb'] = Number(filters.guests);
+            filters['accommodations.guests'] = Number(filters.guests);
             delete filters.guests;
         }
     });
 
     const options = { ...locationParams, ...filters };
     const propertiesCount = await Property.find(options).count();
-    const projection: (keyof PropertyPreview | 'accommodations.pricePerNight')[] = [
-        'type',
+    const projection: (keyof PropertyPreview | 'accommodations.price')[] = [
+        'category',
         'name',
         'description',
         'location',
         'rating',
         'images',
         'numbOfReview',
-        'accommodations.pricePerNight',
+        'accommodations.price',
     ];
     const properties: HydratedDocument<IPropertySchema>[] | [] = await Property.find(
         { ...locationParams, ...filters },

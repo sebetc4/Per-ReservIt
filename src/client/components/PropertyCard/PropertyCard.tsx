@@ -3,7 +3,7 @@ import { PropertyPreview } from '../../../types/properties.types';
 import Image from 'next/image';
 import { Box, Rating } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
-import { propertyType } from '../../../utils/constants.utils';
+import { propertyCategories } from '../../../utils/constants.utils';
 import Link from 'next/link';
 
 interface IPropertyCardProps {
@@ -69,7 +69,7 @@ export default function PropertyItem({ property }: IPropertyCardProps) {
                         gutterBottom
                         variant='subtitle1'
                     >
-                        {`${propertyType[property.type]} à ${property.location.city}`}
+                        {`${propertyCategories[property.category]} à ${property.location.city}`}
                     </Typography>
                     <Typography
                         variant='body2'

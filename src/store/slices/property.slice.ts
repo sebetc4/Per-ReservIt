@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import Api from '../../config/api.config';
+import { api } from '../../config/api.config';
 import { PropertyType } from '../../types/properties.types';
 
 interface IPropertyState {
@@ -36,7 +36,7 @@ export const propertySlice = createSlice({
 });
 
 export const fetchProperty = createAsyncThunk('property/fetchOne', async (id: string) => {
-    const res = await Api.fetchProperty(id);
+    const res = await api.fetchProperty(id);
     return res.data;
 
 });

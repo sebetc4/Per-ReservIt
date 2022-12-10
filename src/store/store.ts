@@ -9,9 +9,12 @@ const reducer: typeof combinedReducer = (state, action) => {
         const nextState = {
             ...state,
             ...action.payload,
-            // properties: {
-            //     data: [...state!.properties.data, ...action.payload.properties.data],
-            // },
+            // Alert
+            alert: {
+                open: state?.alert.open,
+                message: state?.alert.message,
+                type: state?.alert.type,
+            },
             // counter: {
             //     count: state?.counter.count + action.payload.counter.count,
             // },

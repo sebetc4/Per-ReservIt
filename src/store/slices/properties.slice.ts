@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import Api from '../../config/api.config';
+import { api } from '../../config/api.config';
 import { PropertyPreview } from '../../types/properties.types';
 
 interface IPropertiesState {
@@ -28,10 +28,10 @@ export const propertiesSlice = createSlice({
         builder.addCase(fetchAllProperties.fulfilled, (state, action) => {
             const properties = action.payload.properties;
             const data = properties.map((prop: any) => {
-                let minPrice = prop.accommodations[0].pricePerNight
+                let minPrice = prop.accommodations[0].price
                 prop.accommodations.forEach((accom: any) => {
-                    if (accom.pricePerNight < minPrice) {
-                        minPrice = accom.pricePerNight;
+                    if (accom.price < minPrice) {
+                        minPrice = accom.price;
                     }
                 })
                 prop.minPrice = minPrice
@@ -53,18 +53,17 @@ export const propertiesSlice = createSlice({
 interface IFetchAllPropertiesParams {
     currentPage: string;
     location: string | null;
-    type: string;
+    category: string;
     guests: string | null;
 }
 
 export const fetchAllProperties = createAsyncThunk(
     'properties/fetchAll',
-    async ({ currentPage, location, type, guests }: IFetchAllPropertiesParams) => {
-        const res = await Api.fetchAllProperties(currentPage, location, type, guests);
+    async ({ currentPage, location, category, guests }: IFetchAllPropertiesParams) => {
+        const res = await api.fetchAllProperties(currentPage, location, category, guests);
         return res.data;
     }
 );
 
 export const {} = propertiesSlice.actions;
-// export const selectAuthState = (state: AppState) => state.auth.authState;
 export default propertiesSlice.reducer;

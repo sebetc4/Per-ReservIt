@@ -1,7 +1,5 @@
 import { Document, HydratedDocument, ObjectId, SchemaTimestampsConfig } from 'mongoose';
 
-type ModelType<IShema> = HydratedDocument<IShema> & SchemaTimestampsConfig;
-
 interface ILocation {
     address: string;
     city: string;
@@ -23,8 +21,8 @@ interface IAccommodationOptions {
 export interface IAccommodation {
     quantity: number;
     name: string;
-    guestNumb: number;
-    pricePerNight: number;
+    guests: number;
+    price: number;
     beds: IBeds;
     options: IAccommodationOptions;
 }
@@ -55,11 +53,11 @@ interface IReviewProperty {
     comment: string;
 }
 
-export type KeysOfPropertyType = PropertyType['type'] | 'all';
+export type KeysOfPropertyCategory = PropertyType['category'] | 'all';
 
 export interface IPropertySchema extends Document {
     name: string;
-    type: 'hotel' | 'hostel' | 'guest house' | 'house' | 'apartement';
+    category: 'hotel' | 'hostel' | 'guest house' | 'house' | 'apartement';
     description: string;
     location: ILocation;
     accommodations: IAccommodation[];
@@ -71,9 +69,9 @@ export interface IPropertySchema extends Document {
     user: ObjectId;
 }
 
-export type PropertyType = ModelType<IPropertySchema>;
+export type PropertyType = HydratedDocument<IPropertySchema> & SchemaTimestampsConfig;
 
 export type PropertyPreview = Pick<
     PropertyType,
-    '_id' | 'name' | 'type' | 'description' | 'location' | 'rating' | 'images' | 'numbOfReview'
+    '_id' | 'name' | 'category' | 'description' | 'location' | 'rating' | 'images' | 'numbOfReview'
 > & { minPrice: number };

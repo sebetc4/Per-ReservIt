@@ -1,37 +1,43 @@
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { signIn } from 'next-auth/react';
 
-import { Box, Typography, Container, Button, Grid } from '@mui/material';
+import { Box, Typography, Container, Grid } from '@mui/material';
 
-import { CustomPasswordInput, CustomTextField, ProgressButton } from '../../client/components';
-import { signUpSchema } from '../../utils/validationSchemas';
-import { ISignUpBody } from '../../types/request.types';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { ISignInBody } from '../types/request.types';
+import { signInSchema } from '../utils/validationSchemas';
+import { CustomPasswordInput, CustomTextField, ProgressButton } from '../client/components';
+import { HttpErrors } from '../types/api.types';
 
-export default function SignUp() {
+export default function SignIn() {
     // Hooks
-    const router = useRouter();
 
+    const router = useRouter();
     const {
         register,
         handleSubmit,
         formState: { isSubmitting, errors },
         setError,
-    } = useForm<ISignUpBody>({
-        resolver: yupResolver(signUpSchema),
+    } = useForm<ISignInBody>({
+        resolver: yupResolver(signInSchema),
         mode: 'onTouched',
     });
 
-    const onSubmit = async (data: ISignUpBody) => {
-        try {
-            // await api.post('/api/sign-up', data);
-            router.replace('/sign-in');
-        } catch (err) {
-            // if (matchedApiErrorType(ApiErrors.EMAIL_ALREADY_EXISTS, err)) {
-            //     setError('email', { type: 'custom', message: 'Cette adresse e-mail est déjà liée à un compte' });
-            // }
+    const onSubmit = async (data: ISignInBody) => {
+        const res = await signIn('credentials', { ...data, redirect: false });
+        if (!res?.error) {
+            router.replace('/');
+            return;
+        }
+        if (res?.error === HttpErrors.WRONG_EMAIL.message) {
+            setError('email', { type: 'custom', message: "Aucun compte n'est enregistré avec cette adresse e-mail" });
+            return;
+        }
+        if (res?.error === HttpErrors.WRONG_PASSWORD.message) {
+            setError('password', { type: 'custom', message: 'Mot de passe invalide' });
         }
     };
 
@@ -57,7 +63,7 @@ export default function SignUp() {
                         margin: 1,
                     }}
                 >
-                    Créer un compte
+                    Connexion
                 </Typography>
                 <Typography
                     component='h2'
@@ -66,7 +72,7 @@ export default function SignUp() {
                         marginBottom: 4,
                     }}
                 >
-                    Rejoignez notre communauté de petits chefs en herbe.
+                    Heureux de vous retouver! Connectez-vous pour accéder à votre compte.
                 </Typography>
                 <Box
                     component='form'
@@ -82,13 +88,6 @@ export default function SignUp() {
                         spacing={3}
                     >
                         <CustomTextField
-                            name='username'
-                            label='Pseudo'
-                            type='text'
-                            register={register('username')}
-                            error={errors.username}
-                        />
-                        <CustomTextField
                             name='email'
                             label='Adresse e-mail'
                             type='email'
@@ -102,18 +101,17 @@ export default function SignUp() {
                             error={errors.password}
                         />
                     </Grid>
-
                     <ProgressButton
                         loading={isSubmitting}
                         type='submit'
                         variant='contained'
                         buttonSx={{ marginTop: 4, marginBottom: 4 }}
                     >
-                        S'inscrire
+                        Se connecter
                     </ProgressButton>
                 </Box>
                 <Typography>
-                    Vous avez déjà un compte ? <Link href='/sign-in'>Connectez-vous</Link>
+                    Vous n'avez pas de compte ? <Link href='/signup'>Inscrivez-vous</Link>
                 </Typography>
             </Container>
         </>

@@ -1,12 +1,8 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import Api from '../../config/api.config';
-
-interface IAlertState {
-    message: string;
-    type: 'error' | 'success' | 'warning' | 'info' | null;
-}
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IAlertState } from '../../types/alert.types';
 
 const initialState: IAlertState = {
+    open: false,
     message: '',
     type: null,
 };
@@ -16,21 +12,17 @@ export const alertSlice = createSlice({
     initialState,
     reducers: {
         setAlert: (state, action: PayloadAction<Omit<IAlertState, 'open'>>) => {
+            state.open = true;
             state.message = action.payload.message;
             state.type = action.payload.type;
         },
         removeAlert: (state) => {
+            state.open = false;
             state.message = initialState.message;
             state.type = initialState.type;
         },
     },
 });
 
-export const fetchAllProperties = createAsyncThunk('properties/fetchAll', async () => {
-    const res = await Api.fetchAllProperties();
-    return res.data;
-});
-
 export const { setAlert, removeAlert } = alertSlice.actions;
-// export const selectAuthState = (state: AppState) => state.auth.authState;
 export default alertSlice.reducer;

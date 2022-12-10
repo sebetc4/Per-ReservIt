@@ -231,13 +231,13 @@ export default function Header({ showSearchBar, handleOpenSearchBar }: IHeaderPr
                                 <Box>
                                     <Button
                                         sx={{ mr: 4 }}
-                                        onClick={() => router.replace('/sign-up')}
+                                        onClick={() => router.replace('/signup')}
                                     >
                                         Inscription
                                     </Button>
                                     <Button
                                         variant='outlined'
-                                        onClick={() => router.replace('/sign-in')}
+                                        onClick={() => router.replace('/login')}
                                     >
                                         Connexion
                                     </Button>
