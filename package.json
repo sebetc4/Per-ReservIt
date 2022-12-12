@@ -34,6 +34,7 @@
     "swiper": "^8.4.5",
     "typescript": "4.9.3",
     "validator": "^13.7.0",
+    "vanilla-tilt": "^1.7.3",
     "yup": "^0.32.11"
   },
   "devDependencies": {

@@ -1,9 +1,9 @@
-import { HomeComponent } from '../client/layout';
 import { wrapper } from '../store/store';
 import { fetchAllProperties } from '../store/slices/properties.slice';
+import { Home } from '../client/components';
 
-export default function Home() {
-    return <HomeComponent />;
+export default function HomePage() {
+    return <Home />;
 }
 export const getServerSideProps = wrapper.getServerSideProps((store) => async ({ params, query }) => {
     const currentPage = typeof query.page === 'string' ? query.page : '1';

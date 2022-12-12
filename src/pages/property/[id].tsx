@@ -1,10 +1,10 @@
 import Head from 'next/head';
+import { Property } from '../../client/components';
 import { useAppSelector } from '../../client/hooks/redux.hooks';
-import { Property } from '../../client/layout';
-import { fetchProperty } from '../../store/slices/property.slice';
+import { fetchOneProperty } from '../../store/slices/property.slice';
 import { wrapper } from '../../store/store';
 
-export default function PropertyDetails() {
+export default function PropertyPage() {
     const { error, data: property } = useAppSelector((state) => state.property);
 
     return (
@@ -18,7 +18,7 @@ export default function PropertyDetails() {
 }
 export const getServerSideProps = wrapper.getServerSideProps((store) => async ({ params }) => {
     if (typeof params?.id === 'string') {
-        await store.dispatch(fetchProperty(params.id));
+        await store.dispatch(fetchOneProperty(params.id));
     }
     return {
         props: {},

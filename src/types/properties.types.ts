@@ -1,44 +1,55 @@
-import { Document, HydratedDocument, ObjectId, SchemaTimestampsConfig } from 'mongoose';
+import {  HydratedDocument, ObjectId, SchemaTimestampsConfig } from 'mongoose';
+import { ImageType, WithId, WithIdAndTimestamps } from './common.types';
 
-interface ILocation {
+export type PropertySchema = {
+    name: string;
+    category: 'hotel' | 'hostel' | 'guest house' | 'house' | 'apartement';
+    description: string;
+    location: Location;
+    accommodations: Accommodation[];
+    facilities: Facilities;
+    rating: number;
+    numbOfReview: number;
+    reviews: ReviewPropertySchema[];
+    images: ImageType[];
+    user: ObjectId;
+}
+
+type Location = {
     address: string;
     city: string;
     postcode: string;
 }
 
-export interface IImageProperty {
-    public_id: string;
-    url: string;
-}
-
-export type KeysOfAccomodationOptions = keyof IAccommodationOptions;
-
-interface IAccommodationOptions {
-    airConditionned?: boolean;
-    minibar?: boolean;
-}
-
-export interface IAccommodation {
+type AccommodationSchema = {
     quantity: number;
     name: string;
     guests: number;
     price: number;
-    beds: IBeds;
-    options: IAccommodationOptions;
+    beds: Beds;
+    options: AccommodationOptions;
 }
 
-export type KeysOfBeds = keyof IBeds;
+export type Accommodation = WithId<AccommodationSchema>
 
-interface IBeds {
+
+type AccommodationOptions = {
+    airConditionned?: boolean;
+    minibar?: boolean;
+}
+
+export type KeysOfAccomodationOptions = keyof AccommodationOptions;
+
+type Beds =  {
     largeDoubleBed?: number;
     doubleBed?: number;
     simpleBed?: number;
     sofaBed?: number;
 }
 
-export type KeysOfFacilities = keyof IFacilities;
+export type KeysOfBeds = keyof Beds;
 
-interface IFacilities {
+interface Facilities {
     carPark: boolean;
     internet: boolean;
     breakfast: boolean;
@@ -46,32 +57,21 @@ interface IFacilities {
     roomCleaning: boolean;
 }
 
-interface IReviewProperty {
+export type KeysOfFacilities = keyof Facilities;
+
+type ReviewPropertySchema = {
     user: ObjectId;
     name: string;
     rating: number;
     comment: string;
 }
 
-export type KeysOfPropertyCategory = PropertyType['category'] | 'all';
+export type PropertyInstance = HydratedDocument<PropertySchema> & SchemaTimestampsConfig;
 
-export interface IPropertySchema extends Document {
-    name: string;
-    category: 'hotel' | 'hostel' | 'guest house' | 'house' | 'apartement';
-    description: string;
-    location: ILocation;
-    accommodations: IAccommodation[];
-    facilities: IFacilities;
-    rating: number;
-    numbOfReview: number;
-    reviews: IReviewProperty[];
-    images: IImageProperty[];
-    user: ObjectId;
-}
-
-export type PropertyType = HydratedDocument<IPropertySchema> & SchemaTimestampsConfig;
+export type PropertyType = WithIdAndTimestamps<PropertySchema>
 
 export type PropertyPreview = Pick<
     PropertyType,
     '_id' | 'name' | 'category' | 'description' | 'location' | 'rating' | 'images' | 'numbOfReview'
 > & { minPrice: number };
+

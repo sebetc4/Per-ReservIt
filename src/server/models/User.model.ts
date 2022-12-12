@@ -1,9 +1,9 @@
 import { Schema, model, models } from 'mongoose';
 import bcrypt from 'bcrypt';
-import { IUserSchema, UserType } from '../../types/user.types';
+import { UserSchema, } from '../../types/user.types';
 import { HttpErrors } from '../../types/api.types';
 
-const UserSchema = new Schema<IUserSchema>(
+const UserSchema = new Schema<UserSchema>(
     {
         username: {
             type: String,
@@ -18,7 +18,20 @@ const UserSchema = new Schema<IUserSchema>(
             type: String,
             required: true,
         },
-        avatar: String,
+        avatar: {
+            type: {
+                public_id: {
+                    type: String,
+                    required: true,
+                },
+                url: {
+                    type: String,
+                    required: true,
+                },
+            },
+            required: false,
+            default: null,
+        },
     },
     {
         timestamps: true,
@@ -38,8 +51,8 @@ UserSchema.pre('save', async function () {
     }
 });
 
-UserSchema.methods.isValidPassword = async function (password: UserType['password']) {
-    return await bcrypt.compare(password, this.password)
-}
+UserSchema.methods.isValidPassword = async function (password: UserSchema['password']) {
+    return await bcrypt.compare(password, this.password);
+};
 
-export const User = models.User || model<IUserSchema>('User', UserSchema);
+export const User = models.User || model<UserSchema>('User', UserSchema);

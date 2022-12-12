@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { PropertyType } from '../../types/properties.types';
+import { PropertyInstance } from '../../types/properties.types';
 import onSuccess from '../middlewares/success.middleware';
 import { Property } from '../models/Property.model';
 import { catchError } from '../../utils/api.utils';
@@ -12,13 +12,13 @@ import {
 import { validQueryId } from '../middlewares/validator.middlewares';
 
 export const createProperty = catchError(async (req: NextApiRequest, res: NextApiResponse) => {
-    const createdProperty: PropertyType = await Property.create(req.body);
+    const createdProperty: PropertyInstance = await Property.create(req.body);
     onSuccess({ createdProperty }, 201, res);
 });
 
 export const getOneProperty = catchError(async (req: NextApiRequest, res: NextApiResponse) => {
     const id = validQueryId(req);
-    const property: PropertyType = await findPropertyByIdQuery(id);
+    const property: PropertyInstance = await findPropertyByIdQuery(id);
     onSuccess({ property }, 200, res);
 });
 
@@ -29,7 +29,7 @@ export const getAllProperties = catchError(async (req: NextApiRequest, res: Next
 
 export const updateProperty = catchError(async (req: NextApiRequest, res: NextApiResponse) => {
     const id = validQueryId(req);
-    const updatedProperty: PropertyType = await updatePropertyQuery(id, req.body);
+    const updatedProperty: PropertyInstance = await updatePropertyQuery(id, req.body);
     onSuccess({ updatedProperty }, 200, res);
 });
 

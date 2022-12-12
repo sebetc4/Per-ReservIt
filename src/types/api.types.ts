@@ -10,6 +10,13 @@ export enum ResStatus {
     SUCCESS = 'SUCCESS',
 }
 
+export interface ICustomError {
+    message: string;
+    status: ResStatus.ERROR;
+    error?: Error;
+    stack?: string;    
+}
+
 // https://stackoverflow.com/questions/41179474/use-object-literal-as-typescript-enum-values
 export class HttpErrors {
     static readonly INVALID_QUERY_ID = new HttpErrors('The query ID is invalid', 400);

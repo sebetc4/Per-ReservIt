@@ -4,7 +4,7 @@ import { deleteProprety, getOneProperty, updateProperty } from '../../../server/
 import onError from '../../../server/middlewares/errors.middleware';
 import { HttpErrors, ReqMethods } from '../../../types/api.types';
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+export default async function propertyRouter (req: NextApiRequest, res: NextApiResponse) {
     dbConnect();
     switch (req.method) {
         case ReqMethods.GET:

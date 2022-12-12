@@ -1,16 +1,18 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
 import { api } from '../../config/api.config';
+import { ICustomError } from '../../types/api.types';
 import { PropertyType } from '../../types/properties.types';
 
 interface IPropertyState {
     loading: boolean;
-    error: boolean;
+    error: string | null | undefined;
     data: PropertyType | null;
 }
 
 const initialState: IPropertyState = {
     loading: false,
-    error: false,
+    error: null,
     data: null,
 };
 
@@ -19,27 +21,36 @@ export const propertySlice = createSlice({
     initialState,
     reducers: {},
     extraReducers: (builder) => {
-        builder.addCase(fetchProperty.pending, (state, action) => {
+        builder.addCase(fetchOneProperty.pending, (state, action) => {
             state.loading = true;
-            state.error = false
+            state.error = null;
         });
-        builder.addCase(fetchProperty.fulfilled, (state, action) => {
+        builder.addCase(fetchOneProperty.fulfilled, (state, {payload}) => {
             state.loading = false;
-            state.error = false;
-            state.data = action.payload.property;
+            state.error = null;
+            state.data = payload;
         });
-        builder.addCase(fetchProperty.rejected, (state, action) => {
+        builder.addCase(fetchOneProperty.rejected, (state, action) => {
             state.loading = false;
-            state.error = true;
+            state.error = action.payload ? action.payload.message : action.error.message;
         });
     },
 });
 
-export const fetchProperty = createAsyncThunk('property/fetchOne', async (id: string) => {
-    const res = await api.fetchProperty(id);
-    return res.data;
-
-});
+export const fetchOneProperty = createAsyncThunk<any, string, { rejectValue: ICustomError }>(
+    'property/fetchOne',
+    async (id, { rejectWithValue }) => {
+        try {
+            const res = await api.fetchOneProperty(id);
+            return res.data.property;
+        } catch (err) {
+            if (err instanceof AxiosError) {
+                return rejectWithValue(err.response?.data);
+            }
+            throw err;
+        }
+    }
+);
 
 export const {} = propertySlice.actions;
 export default propertySlice.reducer;

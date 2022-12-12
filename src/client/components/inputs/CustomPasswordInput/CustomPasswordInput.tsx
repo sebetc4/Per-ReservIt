@@ -3,14 +3,14 @@ import { FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInpu
 import { MouseEvent, useState } from 'react';
 import { FieldError, UseFormRegisterReturn } from 'react-hook-form';
 
-interface ICustomPasswordInputProps {
+type CustomPasswordInputProps = {
     name: string;
     label: string;
     register: UseFormRegisterReturn;
     error: FieldError | undefined;
 }
 
-export default function CustomPasswordInput({ name, label, register, error }: ICustomPasswordInputProps) {
+export default function CustomPasswordInput({ name, label, register, error }: CustomPasswordInputProps) {
     const [showPassword, setShowPasswor] = useState<boolean>(false);
 
     const handleClickShowPassword = () => setShowPasswor((prev) => !prev);

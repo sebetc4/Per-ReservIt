@@ -15,6 +15,7 @@ const reducer: typeof combinedReducer = (state, action) => {
                 message: state?.alert.message,
                 type: state?.alert.type,
             },
+            user: { ...state?.user }
             // counter: {
             //     count: state?.counter.count + action.payload.counter.count,
             // },

@@ -2,9 +2,10 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import nextAuth, { Session } from 'next-auth';
 import { signInSchema } from '../../../utils/validationSchemas';
 import { HttpErrors } from '../../../types/api.types';
-import { User } from '../../../server/models/User.model';
 import dbConnect from '../../../server/config/db.config';
-import { UserType } from '../../../types/user.types';
+import { findUserByEmail } from '../../../server/queries/user.queries';
+import { User } from 'next-auth';
+import { UserInstance } from '../../../types/user.types';
 
 declare module 'next-auth' {
     interface Session {
@@ -14,7 +15,12 @@ declare module 'next-auth' {
     }
 }
 
-const validCredentials = async (credentials: any) => {
+type Credentials = {
+    email: string;
+    password: string;
+}
+
+const validCredentials = async (credentials: Credentials) => {
     const { email, password } = credentials;
     if (!(await signInSchema.isValid({ email, password }))) {
         throw new Error(HttpErrors.BAD_REQUEST.message);
@@ -22,34 +28,27 @@ const validCredentials = async (credentials: any) => {
     return credentials;
 };
 
-const findUser = async (email: UserType['email']) => {
-    const user = await User.findOne({ email });
-    if (!user) {
-        throw new Error(HttpErrors.WRONG_EMAIL.message);
-    }
-    return user;
-};
-
 export default nextAuth({
-    session: {
-        strategy: 'jwt',
-    },
     providers: [
         CredentialsProvider({
             name: 'Credentials',
             credentials: {},
-            async authorize(credentials: unknown, req) {
+            async authorize(credentials, req) {
                 await dbConnect();
-                const { email, password } = await validCredentials(credentials);
-                const user = await findUser(email);
+                const { email, password } = await validCredentials(credentials as Credentials);
+                const user: UserInstance = await findUserByEmail(email);
                 if (!(await user.isValidPassword(password))) {
                     throw new Error(HttpErrors.WRONG_PASSWORD.message);
                 }
-                return user;
+                return user as User;
             },
         }),
     ],
     callbacks: {
+        jwt: async ({ token, user }) => {
+            return token;
+        },
+        
         session: async ({ session, token }) => {
             session.user._id = token.sub;
             return session;

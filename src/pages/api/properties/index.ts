@@ -6,7 +6,7 @@ import onError from '../../../server/middlewares/errors.middleware';
 import { HttpErrors, ReqMethods } from '../../../types/api.types';
 
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+export default async function propertiesRouter (req: NextApiRequest, res: NextApiResponse) {
     dbConnect()
     switch (req.method) {
         case ReqMethods.GET:

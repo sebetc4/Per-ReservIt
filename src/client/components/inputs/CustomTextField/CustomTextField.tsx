@@ -1,7 +1,7 @@
 import { Grid, TextField, Typography } from "@mui/material";
 import { FieldError, UseFormRegisterReturn } from "react-hook-form";
 
-interface ICustomTextField {
+type CustomTextField = {
     name: string;
     label: string;
     type: string;
@@ -9,7 +9,7 @@ interface ICustomTextField {
     error: FieldError | undefined;
 }
 
-export default function CustomTextField({ name, label, type, register, error }: ICustomTextField) {
+export default function CustomTextField({ name, label, type, register, error }: CustomTextField) {
     return (
         <Grid
             item

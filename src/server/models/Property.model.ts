@@ -1,7 +1,7 @@
 import mongoose, { Schema, model, models } from 'mongoose';
-import { IPropertySchema } from '../../types/properties.types';
+import { PropertySchema } from '../../types/properties.types';
 
-const PropertySchema = new Schema<IPropertySchema>(
+const PropertySchema = new Schema<PropertySchema>(
     {
         name: {
             type: String,
@@ -162,4 +162,4 @@ const PropertySchema = new Schema<IPropertySchema>(
     }
 );
 
-export const Property = models.Property || model<IPropertySchema>('Property', PropertySchema);
+export const Property = models.Property || model<PropertySchema>('Property', PropertySchema);

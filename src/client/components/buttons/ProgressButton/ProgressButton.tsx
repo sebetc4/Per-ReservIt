@@ -1,7 +1,7 @@
 import { Box, Button, CircularProgress, SxProps } from '@mui/material';
 import React, { ReactNode } from 'react';
 
-interface IProgressButtonProps {
+type ProgressButtonProps = {
     children: ReactNode;
     loading: boolean;
     variant?: 'text' | 'contained' | 'outlined';
@@ -9,7 +9,7 @@ interface IProgressButtonProps {
     buttonSx?: SxProps;
     circularProgressSx?: SxProps;
     handleButtonClick?: () => void;
-}
+};
 
 export default function ProgressButton({
     children,
@@ -19,7 +19,7 @@ export default function ProgressButton({
     buttonSx,
     circularProgressSx,
     handleButtonClick,
-}: IProgressButtonProps) {
+}: ProgressButtonProps) {
     return (
         <Box sx={{ m: 1, position: 'relative' }}>
             <Button

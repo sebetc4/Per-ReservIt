@@ -24,15 +24,18 @@ class ApiService {
         }
         return this.api.get(query);
     }
-    fetchProperty(id: string) {
+    fetchOneProperty(id: string) {
         return this.api.get(`/properties/${id}`);
     }
     // User
     signUp(data: ISignUpBody) {
-        return this.api.post('/auth/signup', data);
+        return this.api.post('/user', data);
     }
     fetchCurrentUserData() {
-        return this.api.get('/auth/user');
+        return this.api.get('/user');
+    }
+    updateCurrentUser() {
+        return this.api.put('/user');
     }
 }
 
