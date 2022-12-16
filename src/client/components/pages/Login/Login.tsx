@@ -1,19 +1,19 @@
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { signIn } from 'next-auth/react';
 
-import { Box, Typography, Grid, Container } from '@mui/material';
+import { Box, Typography, Grid, Container, Button } from '@mui/material';
 
 import { useRouter } from 'next/router';
-import { ISignInBody } from '../../../../types/request.types';
 import { signInSchema } from '../../../../utils/validationSchemas';
-import { CustomPasswordInput, CustomTextField, ProgressButton } from '../..';
-import { HttpErrors } from '../../../../types/api.types';
+import { CustomPasswordInput, CustomTextField, GoogleButton, ProgressButton } from '../..';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
 import Image from 'next/image';
 import LoginImage from '../../../../../public/images/login-hotel.jpg';
-import { fetchCurrentUserData } from '../../../../store/slices/user.slice';
+import { loginWithCredentials, logout } from '../../../../store/slices/auth.slice';
+import { Credentials } from '../../../../types/request.types';
+import { useEffect, useState } from 'react';
+import { CustomError } from '../../../../types/api.types';
 
 export default function Login() {
     // Hooks
@@ -24,35 +24,64 @@ export default function Login() {
         handleSubmit,
         formState: { isSubmitting, errors },
         setError,
-    } = useForm<ISignInBody>({
+    } = useForm<Credentials>({
         resolver: yupResolver(signInSchema),
         mode: 'onTouched',
     });
 
     // Store
-    const { isAuth } = useAppSelector((state) => state.user);
+    const { isAuth, error } = useAppSelector((state) => state.auth);
 
-    const onSubmit = async (data: ISignInBody) => {
-        const res = await signIn('credentials', { ...data, redirect: false });
-        if (!res?.error) {
-            dispatch(fetchCurrentUserData());
-            router.replace('/');
-        } else if (res.error === HttpErrors.WRONG_EMAIL.message) {
-            setError('email', { type: 'custom', message: "Aucun compte n'est enregistré avec cette adresse e-mail" });
-        } else if (res.error === HttpErrors.WRONG_PASSWORD.message) {
-            setError('password', { type: 'custom', message: 'Mot de passe invalide' });
-        }
+    const [showProviderError, setShowProviderError] = useState<boolean>(false);
+
+    const onSubmit = async (data: Credentials) => {
+        showProviderError && setShowProviderError(false);
+        dispatch(loginWithCredentials(data));
     };
+
+    // Handle auth error
+    useEffect(() => {
+        if (error) {
+            switch (error) {
+                case CustomError.INVALID_TOKEN.message:
+                    dispatch(logout());
+                    break;
+                case CustomError.EMAIL_ALREADY_EXISTS.message ||
+                    error === CustomError.EMAIL_ALREADY_EXISTS_OTHER_PROVIDER.message:
+                    setShowProviderError(true);
+                    break;
+                case CustomError.WRONG_EMAIL.message:
+                    setError('email', {
+                        type: 'custom',
+                        message: "Aucun compte n'est enregistré avec cette adresse e-mail",
+                    });
+                    break;
+                case CustomError.WRONG_PASSWORD.message:
+                    setError('password', { type: 'custom', message: 'Mot de passe invalide' });
+                    break;
+            }
+        }
+    }, [error, setError]);
+
+    // // Redirect on success login
+    // useEffect(() => {
+    //     console.log({ isAuth, error });
+    //     if (isAuth && error) {
+    //         router.replace('/');
+    //     }
+    // }, [isAuth, error, router]);
 
     return (
         <Grid
             container
-            maxWidth='xs'
+            maxWidth='xl'
+            sx={{ ml: 'auto', mr: 'auto' }}
         >
             <Grid
                 item
                 xs={6}
                 sx={{
+                    height: '100%',
                     display: 'flex',
                     alignItems: 'center',
                 }}
@@ -111,15 +140,27 @@ export default function Login() {
                             />
                         </Grid>
                         <ProgressButton
-                            loading={isSubmitting}
+                            isLoading={isSubmitting}
+                            disabled={isSubmitting}
                             type='submit'
                             variant='contained'
-                            buttonSx={{ marginTop: 4, marginBottom: 4 }}
+                            buttonSx={{ marginTop: 4, marginBottom: 2 }}
+                            fullWidth
+                            size='large'
                         >
                             Se connecter
                         </ProgressButton>
+                        <GoogleButton />
+                        {showProviderError && (
+                            <Typography
+                                color='error'
+                                sx={{ mt: 4, textAlign: 'center' }}
+                            >
+                                Un compte est déjà lié à cette adresse e-mail avec une autre méthode de connexion
+                            </Typography>
+                        )}
                     </Box>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Box sx={{ mt: 4, display: 'flex', gap: 1 }}>
                         <Typography>Vous n'avez pas de compte ?</Typography>
                         <Link
                             href='/signup'
@@ -133,7 +174,7 @@ export default function Login() {
                                     cursor: 'pointer',
                                 }}
                             >
-                                Connectez-vous
+                                Inscrivez-vous
                             </Typography>
                         </Link>
                     </Box>
@@ -146,6 +187,7 @@ export default function Login() {
                     position: 'relative',
                     borderTopLeftRadius: 80,
                     borderBottomLeftRadius: 80,
+                    display: 'flex',
                     overflow: 'hidden',
                 }}
             >

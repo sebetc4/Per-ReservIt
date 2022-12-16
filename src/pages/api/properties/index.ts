@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../../server/config/db.config';
 import { createProperty, getAllProperties } from '../../../server/controllers/properties.controller';
 import onError from '../../../server/middlewares/errors.middleware';
-import { HttpErrors, ReqMethods } from '../../../types/api.types';
+import { CustomError, ReqMethods } from '../../../types/api.types';
 
 
 export default async function propertiesRouter (req: NextApiRequest, res: NextApiResponse) {
@@ -16,6 +16,6 @@ export default async function propertiesRouter (req: NextApiRequest, res: NextAp
             await createProperty(req, res)
             break
         default:
-            onError(HttpErrors.METHOD_NOT_ALLOWED, res);
+            onError(CustomError.METHOD_NOT_ALLOWED, res);
     }
 }

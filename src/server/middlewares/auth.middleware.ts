@@ -1,11 +1,17 @@
 import { NextApiRequest } from "next"
-import { getSession } from "next-auth/react"
-import { HttpErrors } from "../../types/api.types"
+import { getToken } from "next-auth/jwt"
+import { CustomError } from "../../types/api.types"
+import { UserInstance } from "../../types/user.types"
+import { User } from "../models/User.model"
 
 export const authUser = async (req: NextApiRequest) => {
-    const session = await getSession({req})
-    if(!session) {
-        throw HttpErrors.UNAUTHORIZED
-    }
-    return session.user
+    const token = await getToken({req})   
+    if(!token) {
+        throw CustomError.UNAUTHORIZED
+    } 
+    const user: UserInstance | null = await User.findOne({email: token.email})
+    if(!user) {
+        throw CustomError.INVALID_TOKEN
+    } 
+    return user
 }

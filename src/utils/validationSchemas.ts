@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { ISignInBody, ISignUpBody } from '../types/request.types';
+import { Credentials, SignUpBody, UpdateGeneralSettingsBody } from '../types/request.types';
 
 const usernameValidation = yup
     .string()
@@ -16,7 +16,7 @@ const emailValidation = yup
     .required("L'adresse e-mail est requise")
     .email('Adresse e-mail non valide');
 
-export const signUpSchema: yup.SchemaOf<ISignUpBody> = yup.object().shape({
+export const signUpSchema: yup.SchemaOf<SignUpBody> = yup.object().shape({
     username: usernameValidation,
     email: emailValidation,
     password: yup
@@ -26,11 +26,16 @@ export const signUpSchema: yup.SchemaOf<ISignUpBody> = yup.object().shape({
         .max(40, 'Le mot de passe doit faire au maximum 20 caractères'),
 });
 
-export const signInSchema: yup.SchemaOf<ISignInBody> = yup.object().shape({
+export const signInSchema: yup.SchemaOf<Credentials> = yup.object().shape({
     email: emailValidation,
     password: yup
         .string()
         .required('Le mot de passe est requis')
         .min(6, 'Le mot de passe est invalide')
         .max(40, 'Le mot de passe est invalide'),
+});
+
+export const updateGeneralSettingsSchema: yup.SchemaOf<UpdateGeneralSettingsBody> = yup.object().shape({
+    username: usernameValidation,
+    email: emailValidation,
 });

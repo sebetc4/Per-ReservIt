@@ -3,35 +3,44 @@ import React, { ReactNode } from 'react';
 
 type ProgressButtonProps = {
     children: ReactNode;
-    loading: boolean;
+    isLoading: boolean;
+    disabled: boolean;
     variant?: 'text' | 'contained' | 'outlined';
     type?: 'button' | 'submit' | 'reset';
     buttonSx?: SxProps;
     circularProgressSx?: SxProps;
-    handleButtonClick?: () => void;
+    handleOnClick?: () => void;
+    fullWidth?: boolean;
+    size?: 'small' | 'medium' | 'large'
+    onClick?: (event: MouseEvent) => void;
 };
 
 export default function ProgressButton({
     children,
-    loading,
+    isLoading,
+    disabled,
     variant,
     type,
     buttonSx,
     circularProgressSx,
-    handleButtonClick,
+    handleOnClick,
+    fullWidth = false,
+    size = 'medium',
 }: ProgressButtonProps) {
     return (
-        <Box sx={{ m: 1, position: 'relative' }}>
+        <Box sx={{ width: fullWidth? '100%' : 'auto', m: 1, position: 'relative' }}>
             <Button
                 type={type}
                 variant={variant}
                 sx={buttonSx}
-                disabled={loading}
-                onClick={handleButtonClick}
+                disabled={disabled}
+                onClick={handleOnClick}
+                fullWidth
+                size={size}
             >
                 {children}
             </Button>
-            {loading && (
+            {isLoading && (
                 <CircularProgress
                     size={24}
                     sx={{

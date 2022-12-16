@@ -2,8 +2,7 @@ import { Box, Container, Typography, useTheme } from '@mui/material';
 import Link from 'next/link';
 import React, { RefObject } from 'react';
 
-interface IFooterProps {
-}
+interface IFooterProps {}
 
 export default function Footer({}: IFooterProps) {
     const theme = useTheme();
@@ -11,7 +10,9 @@ export default function Footer({}: IFooterProps) {
         <Box
             component='footer'
             sx={{
-                backgroundColor: theme.palette.grey[100]
+                borderTop: 1,
+                borderColor: theme.palette.grey[200],
+                backgroundColor: theme.palette.grey[100],
             }}
         >
             <Container

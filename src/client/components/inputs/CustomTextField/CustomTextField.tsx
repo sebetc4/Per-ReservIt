@@ -6,10 +6,11 @@ type CustomTextField = {
     label: string;
     type: string;
     register: UseFormRegisterReturn;
+    disabled?: boolean;
     error: FieldError | undefined;
 }
 
-export default function CustomTextField({ name, label, type, register, error }: CustomTextField) {
+export default function CustomTextField({ name, label, type, register, error, disabled }: CustomTextField) {
     return (
         <Grid
             item
@@ -22,6 +23,7 @@ export default function CustomTextField({ name, label, type, register, error }: 
                 variant='outlined'
                 type={type}
                 fullWidth
+                disabled={disabled}
                 {...register}
                 error={!!error}
             />

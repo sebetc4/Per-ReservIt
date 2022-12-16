@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -21,49 +21,43 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import { Search } from '../..';
-import { useAppSelector } from '../../../hooks/redux.hooks';
-import { signOut } from 'next-auth/react';
+import { CustomAvatar, Search } from '../..';
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
+import { logout } from '../../../../store/slices/auth.slice';
 
-interface IHeaderProps {
+type HeaderProps = {
     showSearchBar: boolean;
     handleOpenSearchBar: () => void;
 }
 
-export default function Header({ showSearchBar, handleOpenSearchBar }: IHeaderProps) {
+export default function Header({ showSearchBar, handleOpenSearchBar }: HeaderProps) {
+
+
     // Hooks
+    const dispatch = useAppDispatch();
     const theme = useTheme();
     const router = useRouter();
-    const { isAuth } = useAppSelector((state) => state.user);
+
+    const { isAuth } = useAppSelector((state) => state.auth);
+    const {data: user} = useAppSelector((state) => state.user);
 
     // State
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
-    const [headerOnTop, setHeaderOnTop] = useState<boolean>(true);
-
-    useEffect(() => {
-        const handleHeaderOnTop = () => setHeaderOnTop(window.scrollY === 0);
-        window.addEventListener('scroll', handleHeaderOnTop);
-        handleHeaderOnTop();
-        return () => {
-            window.removeEventListener('scroll', handleHeaderOnTop);
-        };
-    }, []);
-
     const rightMenu = [
         {
-            name: 'Réservations',
+            name: 'Vos réservations',
             action: () => router.replace('/bookings'),
         },
         {
-            name: 'Profil',
-            action: () => router.replace('/profile'),
+            name: 'Vos paramètres',
+            action: () => router.replace('/settings'),
         },
         {
             name: 'Déconnexion',
             action: async () => {
-                await signOut({ redirect: false });
-                router.replace('/');
+                await router.replace('/');
+                dispatch(logout());
             },
         },
     ];
@@ -88,17 +82,13 @@ export default function Header({ showSearchBar, handleOpenSearchBar }: IHeaderPr
             sx={{
                 pt: 1,
                 pb: 1,
-                transition: 'all .3s',
-                boxShadow:
-                    headerOnTop && !showSearchBar
-                        ? 'none'
-                        : '0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12)',
-                backgroundColor: headerOnTop && !showSearchBar ? 'transparent' : theme.palette.grey[100],
+                backgroundColor:  theme.palette.grey[100],
             }}
             color='default'
         >
             <Container maxWidth='xl'>
                 <Toolbar disableGutters>
+
                     {/* Mobile */}
                     <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
                         <Box sx={{ flexGrow: 1 }}>
@@ -154,7 +144,7 @@ export default function Header({ showSearchBar, handleOpenSearchBar }: IHeaderPr
                         <Grid
                             item
                             xs={3}
-                            sx={{ display: 'flex', alignItems: 'center'}}
+                            sx={{ display: 'flex', alignItems: 'center' }}
                         >
                             <Link
                                 href='/'
@@ -204,7 +194,7 @@ export default function Header({ showSearchBar, handleOpenSearchBar }: IHeaderPr
                                     Une idée de destination? Recherchez votre hebergement
                                     <Box
                                         sx={{
-                                            backgroundColor: '#E14D2A',
+                                            backgroundColor: theme.palette.primary.main,
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -225,14 +215,14 @@ export default function Header({ showSearchBar, handleOpenSearchBar }: IHeaderPr
                             xs={3}
                             sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}
                         >
-                            {isAuth ? (
+                            {isAuth && user ? (
                                 <>
-                                    <Tooltip title='Open settings'>
+                                    <Tooltip title='Compte'>
                                         <IconButton
                                             onClick={handleOpenUserMenu}
                                             sx={{ p: 0 }}
                                         >
-                                            <Avatar alt='Remy Sharp' />
+                                            <CustomAvatar username={user.username} avatarUrl={user.avatar.url} />
                                         </IconButton>
                                     </Tooltip>
                                     <Menu

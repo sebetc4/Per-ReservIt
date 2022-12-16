@@ -1,4 +1,4 @@
-import { createTheme, CssBaseline, PaletteMode, ThemeProvider } from '@mui/material';
+import { createTheme, CssBaseline, GlobalStyles, PaletteMode, ThemeProvider } from '@mui/material';
 import { createContext, ReactNode, useMemo, useState } from 'react';
 import { commonTheme, darkPalette, lightPalette } from '../../theme/theme';
 
@@ -7,13 +7,11 @@ interface CustomThemeProvider {
 }
 
 export default function CustomThemeProvider({ children }: CustomThemeProvider) {
-
     // State
     const [mode, setMode] = useState<PaletteMode>('light');
-    
+
     // Context
     const ColorModeContext = createContext({ toggleColorMode: () => {} });
-
 
     const colorMode = useMemo(
         () => ({
@@ -23,15 +21,18 @@ export default function CustomThemeProvider({ children }: CustomThemeProvider) {
         }),
         []
     );
-    
-    const theme = useMemo(() => createTheme({
-        ...commonTheme,
-        palette: {
-            mode,
-            ...(mode === 'light' ? lightPalette : darkPalette),
-        },
-    }), [mode]);
 
+    const theme = useMemo(
+        () =>
+            createTheme({
+                ...commonTheme,
+                palette: {
+                    mode,
+                    ...(mode === 'light' ? lightPalette : darkPalette),
+                },
+            }),
+        [mode]
+    );
 
     return (
         <ColorModeContext.Provider value={colorMode}>

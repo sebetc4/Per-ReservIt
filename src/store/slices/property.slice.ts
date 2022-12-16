@@ -1,17 +1,17 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import { api } from '../../config/api.config';
-import { ICustomError } from '../../types/api.types';
-import { PropertyType } from '../../types/properties.types';
+import { ICustomHttpError } from '../../types/api.types';
+import { Property } from '../../types/properties.types';
 
-interface IPropertyState {
-    loading: boolean;
+type PropertyState = {
+    isLoading: boolean;
     error: string | null | undefined;
-    data: PropertyType | null;
+    data: Property | null;
 }
 
-const initialState: IPropertyState = {
-    loading: false,
+const initialState: PropertyState = {
+    isLoading: false,
     error: null,
     data: null,
 };
@@ -22,22 +22,22 @@ export const propertySlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder.addCase(fetchOneProperty.pending, (state, action) => {
-            state.loading = true;
+            state.isLoading = true;
             state.error = null;
         });
         builder.addCase(fetchOneProperty.fulfilled, (state, {payload}) => {
-            state.loading = false;
+            state.isLoading = false;
             state.error = null;
             state.data = payload;
         });
         builder.addCase(fetchOneProperty.rejected, (state, action) => {
-            state.loading = false;
+            state.isLoading = false;
             state.error = action.payload ? action.payload.message : action.error.message;
         });
     },
 });
 
-export const fetchOneProperty = createAsyncThunk<any, string, { rejectValue: ICustomError }>(
+export const fetchOneProperty = createAsyncThunk<any, string, { rejectValue: ICustomHttpError }>(
     'property/fetchOne',
     async (id, { rejectWithValue }) => {
         try {

@@ -1,10 +1,18 @@
-export interface ISignUpBody {
+// SingnUp
+export interface SignUpBody {
     username: string;
     email: string;
     password: string;
 }
-
-export interface ISignInBody {
+ 
+// Login
+export type Credentials = {
     email: string;
     password: string;
+}
+
+// Update User
+export interface UpdateGeneralSettingsBody {
+    username: string;
+    email: string;
 }

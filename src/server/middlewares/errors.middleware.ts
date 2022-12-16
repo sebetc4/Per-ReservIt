@@ -1,14 +1,14 @@
 import type { NextApiResponse } from 'next';
-import { HttpErrors, ResStatus } from '../../types/api.types';
+import { CustomError, ResStatus } from '../../types/api.types';
 import { isDevEnv } from '../../utils/constants.utils';
 
-export class CustomError {
+export class CustomHttpError {
     status: ResStatus.ERROR;
     message: string;
     error?: Error;
     stack?: string;
     
-    constructor(err: Error | HttpErrors) {
+    constructor(err: Error | CustomError) {
         this.status = ResStatus.ERROR;
         // Message
         if (isDevEnv || !(err instanceof Error)) {
@@ -26,8 +26,8 @@ export class CustomError {
     }
 }
 
-export default function onError(err: Error | HttpErrors, res: NextApiResponse) {
-    const error = new CustomError(err);
+export default function onError(err: Error | CustomError, res: NextApiResponse) {
+    const error = new CustomHttpError(err);
     let statusCode: number
     if (!(err instanceof Error)) {
         statusCode = err.statusCode;

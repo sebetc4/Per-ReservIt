@@ -1,25 +1,25 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import { api } from '../../config/api.config';
-import { ICustomError } from '../../types/api.types';
-import { PropertyPreview, PropertyType } from '../../types/properties.types';
+import { ICustomHttpError } from '../../types/api.types';
+import { PropertyPreview, Property } from '../../types/properties.types';
 
-interface IPropertiesState {
-    loading: boolean;
-    error: string | null | undefined;
+type PropertiesState = {
+    isLoading: boolean;
     data: PropertyPreview[];
     propertiesCount: number;
+    error: string | null | undefined;
 }
 
-const initialState: IPropertiesState = {
-    loading: false,
-    error: null,
+const initialState: PropertiesState = {
+    isLoading: false,
     data: [],
     propertiesCount: 0,
+    error: null,
 };
 
 // Add min price accommodation, delete accommodation array
-const formatPropertyPreview = (properties: Partial<PropertyType>[]): PropertyPreview[] =>  {
+const formatPropertyPreview = (properties: Partial<Property>[]): any =>  {
     return properties.map((prop: any) => {
         let minPrice = prop.accommodations[0].price;
         prop.accommodations.forEach((accom: any) => {
@@ -39,17 +39,17 @@ export const propertiesSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder.addCase(fetchAllProperties.pending, (state, action) => {
-            state.loading = true;
+            state.isLoading = true;
             state.error = null;
         });
         builder.addCase(fetchAllProperties.fulfilled, (state, action) => {
-            state.loading = false;
-            state.error = null;
+            state.isLoading = false;
             state.data = formatPropertyPreview(action.payload.properties);
             state.propertiesCount = action.payload.propertiesCount;
+            state.error = null;
         });
         builder.addCase(fetchAllProperties.rejected, (state, action) => {
-            state.loading = false;
+            state.isLoading = false;
             state.error = action.payload ? action.payload.message : action.error.message;
         });
     },
@@ -63,9 +63,9 @@ interface IFetchAllPropertiesParams {
 }
 
 export const fetchAllProperties = createAsyncThunk<
-    { properties: Partial<PropertyType>[]; propertiesCount: number },
+    { properties: Partial<Property>[]; propertiesCount: number },
     IFetchAllPropertiesParams,
-    { rejectValue: ICustomError }
+    { rejectValue: ICustomHttpError }
 >('properties/fetchAll', async ({ currentPage, location, category, guests }, { rejectWithValue }) => {
     try {
         const res = await api.fetchAllProperties(currentPage, location, category, guests);

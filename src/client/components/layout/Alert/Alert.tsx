@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 
 import { Alert, Slide, SlideProps, Snackbar } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
@@ -16,8 +16,8 @@ function SlideTransition(props: SlideProps) {
     );
 }
 
-export default function AlertComponent() {
-    // Hooks
+function AlertComponent() {
+
 
     // Store
     const {open, message, type} = useAppSelector((state) => state.alert);
@@ -34,7 +34,7 @@ export default function AlertComponent() {
 
     //
     useEffect(() => {
-        open && setShowAlert(true)
+        open ? setShowAlert(true) : setShowAlert(false);
     }, [open]);
 
     return (
@@ -56,3 +56,5 @@ export default function AlertComponent() {
         </Snackbar>
     );
 }
+
+export default memo(AlertComponent)

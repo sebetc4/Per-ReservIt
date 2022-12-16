@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
-import { Box, Rating, Typography, Grid, Divider, Button } from '@mui/material';
+import { Box, Rating, Typography, Grid, Divider, Button, Container } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
@@ -11,7 +11,7 @@ import { setAlert } from '../../../../store/slices/alert.slice';
 interface IProperty {}
 
 export default function Property({}: IProperty) {
-    
+
     // Hooks
     const dispatch = useAppDispatch();
 
@@ -38,7 +38,7 @@ export default function Property({}: IProperty) {
     const keysOfFacilities = property ? Object.keys(property.facilities) : null;
 
     return property ? (
-        <Box>
+        <Container>
             <Grid
                 container
                 spacing={12}
@@ -177,7 +177,7 @@ export default function Property({}: IProperty) {
                     </Button>
                 </Box>
             </Box>
-        </Box>
+        </Container>
     ) : (
         <>Loading</>
     );

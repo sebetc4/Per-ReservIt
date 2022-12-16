@@ -1,24 +1,31 @@
 import { Box, CircularProgress, Container, Fade } from '@mui/material';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { AlertComponent, Header, Footer  } from '../..';
-import { useAppSelector } from '../../../hooks/redux.hooks';
+import { AlertComponent, Header, Footer } from '../..';
+import { setAlert } from '../../../../store/slices/alert.slice';
+import { CustomError } from '../../../../types/api.types';
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
 
-interface ILayoutProps {
+type LayoutProps = {
     children: ReactNode;
-}
+};
 
-export default function Layout({ children }: ILayoutProps) {
+export default function Layout({ children }: LayoutProps) {
+
+    // Hooks
+    const dispatch = useAppDispatch();
 
     // Store
-    const { loading } = useAppSelector((state) => state.user);
+    const { isChecked: authIsChecked, error: authError } = useAppSelector((state) => state.auth);
 
     // State
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
 
-    // Handlers
-    const handleOpenSearchBar = () => setShowSearchBar(true);
-    const handleCloseSearchBar = () => setShowSearchBar(false);
+    useEffect(() => {
+        authError === CustomError.INVALID_TOKEN.message &&
+            dispatch(setAlert({ type: 'error', message: 'Votre session n\'est plus valide. Merci de vous reconnecter.' }));
+    }), [authError];
 
+    // Handle body style when toggle showSearchBar
     useEffect(() => {
         if (showSearchBar) {
             document.body.style.overflow = 'hidden';
@@ -30,7 +37,11 @@ export default function Layout({ children }: ILayoutProps) {
         };
     }, [showSearchBar]);
 
-    return !loading ? (
+    // Handlers
+    const handleOpenSearchBar = () => setShowSearchBar(true);
+    const handleCloseSearchBar = () => setShowSearchBar(false);
+
+    return authIsChecked ? (
         <>
             {/* Header */}
             <Header
@@ -39,17 +50,20 @@ export default function Layout({ children }: ILayoutProps) {
             />
 
             {/* Main */}
-            <Container
-                maxWidth='xl'
+            <Box
                 component='main'
                 sx={{
+                    width: '100%',
+                    position: 'relative',
+                    minHeight: `calc(100vh - 201px)`,
+                    display: 'flex',
                     mt: '80px',
                     pt: 6,
                     pb: 6,
                 }}
             >
                 {children}
-            </Container>
+            </Box>
 
             {/* Footer */}
             <Footer />

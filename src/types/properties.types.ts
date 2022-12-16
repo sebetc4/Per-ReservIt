@@ -1,5 +1,5 @@
 import {  HydratedDocument, ObjectId, SchemaTimestampsConfig } from 'mongoose';
-import { ImageType, WithId, WithIdAndTimestamps } from './common.types';
+import { ImageType, InstanceOfWithDates, WithId, WithIdAndTimestamps } from './common.types';
 
 export type PropertySchema = {
     name: string;
@@ -66,12 +66,12 @@ type ReviewPropertySchema = {
     comment: string;
 }
 
-export type PropertyInstance = HydratedDocument<PropertySchema> & SchemaTimestampsConfig;
+export type PropertyInstance = InstanceOfWithDates<PropertySchema>;
 
-export type PropertyType = WithIdAndTimestamps<PropertySchema>
+export type Property = WithIdAndTimestamps<PropertySchema>
 
 export type PropertyPreview = Pick<
-    PropertyType,
+    Property,
     '_id' | 'name' | 'category' | 'description' | 'location' | 'rating' | 'images' | 'numbOfReview'
 > & { minPrice: number };
 

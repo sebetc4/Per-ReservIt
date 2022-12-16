@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
-import { ISignUpBody } from '../types/request.types';
+import { ObjectId } from 'mongoose';
+import { SignUpBody, UpdateGeneralSettingsBody } from '../types/request.types';
 
 class ApiService {
     api: AxiosInstance;
@@ -24,18 +25,18 @@ class ApiService {
         }
         return this.api.get(query);
     }
-    fetchOneProperty(id: string) {
-        return this.api.get(`/properties/${id}`);
+    fetchOneProperty(_id: ObjectId) {
+        return this.api.get(`/properties/${_id}`);
     }
     // User
-    signUp(data: ISignUpBody) {
+    signUp(data: SignUpBody) {
         return this.api.post('/user', data);
     }
     fetchCurrentUserData() {
         return this.api.get('/user');
     }
-    updateCurrentUser() {
-        return this.api.put('/user');
+    updateGeneralSettings(data: UpdateGeneralSettingsBody) {
+        return this.api.put('/user/update/generalSettings', data);
     }
 }
 

@@ -1,6 +1,6 @@
 import { HydratedDocument, ObjectId } from 'mongoose';
 import { NextApiRequest } from 'next';
-import { HttpErrors } from '../../types/api.types';
+import { CustomError } from '../../types/api.types';
 import { PropertyPreview,PropertyInstance } from '../../types/properties.types';
 import { propertiesPerPage } from '../../utils/constants.utils';
 import { Property } from '../models/Property.model';
@@ -64,7 +64,7 @@ export const findAllPropertiesQuery = async (req: NextApiRequest) => {
 export const findPropertyByIdQuery = async (id: ObjectId) => {
     const property: PropertyInstance | null = await Property.findById(id);
     if (!property) {
-        throw HttpErrors.NOT_FOUND;
+        throw CustomError.NOT_FOUND;
     }
     return property;
 };
@@ -75,7 +75,7 @@ export const updatePropertyQuery = async (id: ObjectId, data: {}) => {
         runValidators: true,
     });
     if (!updateProperty) {
-        throw HttpErrors.NOT_FOUND;
+        throw CustomError.NOT_FOUND;
     }
     return updateProperty;
 };
@@ -83,6 +83,6 @@ export const updatePropertyQuery = async (id: ObjectId, data: {}) => {
 export const deletePropertyQuery = async (id: ObjectId) => {
     const deletedProperty: PropertyInstance | null = await Property.findByIdAndDelete(id);
     if (!deletedProperty) {
-        throw HttpErrors.NOT_FOUND;
+        throw CustomError.NOT_FOUND;
     }
 };

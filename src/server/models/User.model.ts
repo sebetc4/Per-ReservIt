@@ -1,10 +1,16 @@
 import { Schema, model, models } from 'mongoose';
 import bcrypt from 'bcrypt';
-import { UserSchema, } from '../../types/user.types';
-import { HttpErrors } from '../../types/api.types';
+import { UserSchema } from '../../types/user.types';
+import { CustomError } from '../../types/api.types';
+import { boolean } from 'yup';
 
 const UserSchema = new Schema<UserSchema>(
     {
+        authProvider: {
+            type: String,
+            required: true,
+            enum: ['credentials', 'google'],
+        },
         username: {
             type: String,
             required: true,
@@ -16,21 +22,18 @@ const UserSchema = new Schema<UserSchema>(
         },
         password: {
             type: String,
-            required: true,
         },
         avatar: {
             type: {
                 public_id: {
                     type: String,
-                    required: true,
+                    default: null
                 },
                 url: {
                     type: String,
-                    required: true,
+                    default: null
                 },
             },
-            required: false,
-            default: null,
         },
     },
     {
@@ -39,20 +42,31 @@ const UserSchema = new Schema<UserSchema>(
 );
 
 UserSchema.pre('validate', async function () {
-    const user = await User.findOne({ email: this.email });
-    if (user) {
-        throw HttpErrors.EMAIL_ALREADY_EXISTS;
+    if (!this.email || this.isModified('email')) {
+        const user = await User.findOne({ email: this.email });
+        if (user) {
+            throw CustomError.EMAIL_ALREADY_EXISTS;
+        }
     }
 });
 
 UserSchema.pre('save', async function () {
-    if (this.isModified('password')) {
+    if (this.password && this.isModified('password')) {
         this.password = await bcrypt.hash(this.password, 10);
     }
 });
 
 UserSchema.methods.isValidPassword = async function (password: UserSchema['password']) {
-    return await bcrypt.compare(password, this.password);
+    return await bcrypt.compare(password!, this.password);
+};
+
+UserSchema.methods.isEqualValues = function (values: Partial<UserSchema>) {
+    for (let key in values) {
+        if (values[key as keyof UserSchema] === this[key]) {
+            return false;
+        }
+    }
+    return true;
 };
 
 export const User = models.User || model<UserSchema>('User', UserSchema);

@@ -1,4 +1,4 @@
-import { Box, Grid, Pagination, Typography } from '@mui/material';
+import { Box, Container, Grid, Pagination, Typography } from '@mui/material';
 import React, { ChangeEvent, useEffect } from 'react';
 import { setAlert } from '../../../../store/slices/alert.slice';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
@@ -40,7 +40,7 @@ export default function Home() {
     };
 
     return (
-        <Box>
+        <Container>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Typography
                     component='h1'
@@ -68,7 +68,7 @@ export default function Home() {
                 >
                     {properties.map((property) => (
                         <Grid
-                            key={property._id}
+                            key={`${property._id}`}
                             item
                             lg={3}
                             md={4}
@@ -86,7 +86,6 @@ export default function Home() {
             ) : (
                 <Typography>Nous n'avons trouvé aucun résultat pour cette recherche</Typography>
             )}
-
             {propertiesPerPage < propertiesCount && (
                 <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center' }}>
                     <Pagination
@@ -97,6 +96,6 @@ export default function Home() {
                     />
                 </Box>
             )}
-        </Box>
+        </Container>
     );
 }

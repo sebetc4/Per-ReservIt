@@ -2,7 +2,7 @@ import { Box, FormControl, IconButton, InputLabel, NativeSelect, TextField, Typo
 import { useRouter } from 'next/router';
 import React, { SyntheticEvent, useRef } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
-import { PropertySchema, PropertyType } from '../../../../types/properties.types';
+import { PropertySchema, Property } from '../../../../types/properties.types';
 import { propertyCategories } from '../../../../utils/constants.utils';
 
 type SearchProps = {}
@@ -22,7 +22,7 @@ export default function Search({}: SearchProps) {
     // State
     const initialLocation = typeof router.query.location === 'string' ? router.query.location : '';
     const initialGuests = typeof router.query.guests === 'string' ? router.query.guests : '2';
-    const initialCategory = typeof router.query.category === 'string' ? (router.query.category as PropertyType['category']) : 'all';
+    const initialCategory = typeof router.query.category === 'string' ? (router.query.category as Property['category']) : 'all';
 
     // Handlers
     const handleSubmit = (e: SyntheticEvent) => {

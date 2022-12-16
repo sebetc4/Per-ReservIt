@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import dbConnect from '../../../server/config/db.config';
 import { deleteProprety, getOneProperty, updateProperty } from '../../../server/controllers/properties.controller';
 import onError from '../../../server/middlewares/errors.middleware';
-import { HttpErrors, ReqMethods } from '../../../types/api.types';
+import { CustomError, ReqMethods } from '../../../types/api.types';
 
 export default async function propertyRouter (req: NextApiRequest, res: NextApiResponse) {
     dbConnect();
@@ -17,6 +17,6 @@ export default async function propertyRouter (req: NextApiRequest, res: NextApiR
             await deleteProprety(req, res);
             break;
         default:
-            onError(HttpErrors.METHOD_NOT_ALLOWED, res);
+            onError(CustomError.METHOD_NOT_ALLOWED, res);
     }
 }

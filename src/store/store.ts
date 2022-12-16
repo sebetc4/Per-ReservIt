@@ -1,5 +1,6 @@
 import { Action, combineReducers, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import { createWrapper, HYDRATE } from 'next-redux-wrapper';
+import { isDevEnv } from '../utils/constants.utils';
 import * as reducers from './slices';
 
 const combinedReducer = combineReducers(reducers);
@@ -9,19 +10,17 @@ const reducer: typeof combinedReducer = (state, action) => {
         const nextState = {
             ...state,
             ...action.payload,
-            // Alert
-            alert: {
-                open: state?.alert.open,
-                message: state?.alert.message,
-                type: state?.alert.type,
+            auth: {
+                ...action.payload.auth,
+                isChecked: state?.auth.isChecked || action.payload.auth.isChecked,
+                isAuth: state?.auth.isAuth || action.payload.auth.isAuth,
+                error: action.payload.auth.error || state?.auth.error
             },
-            user: { ...state?.user }
-            // counter: {
-            //     count: state?.counter.count + action.payload.counter.count,
-            // },
-            // users: {
-            //     users: [...state!.users.users, ...action.payload.users.users],
-            // },
+            user: {
+                ...action.payload.user,
+                data: action.payload.user.data || state?.user.data,
+                error: action.payload.user.error || state?.user.error
+            },
         };
         return nextState;
     } else {
@@ -29,11 +28,11 @@ const reducer: typeof combinedReducer = (state, action) => {
     }
 };
 
-export const makeStore = () => configureStore({ reducer });
+export const makeStore = () => configureStore({ reducer, devTools: isDevEnv });
 
 type Store = ReturnType<typeof makeStore>;
 export type AppDispatch = Store['dispatch'];
 export type AppState = ReturnType<Store['getState']>;
 export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, AppState, unknown, Action<string>>;
 
-export const wrapper = createWrapper(makeStore);
+export const wrapper = createWrapper(makeStore, { debug: false });

@@ -31,7 +31,6 @@ export default function Carousel({ name, images }: ICarouselProps) {
                 touchRatio={1.5}
                 navigation={true}
                 pagination={{ clickable: true }}
-                className='mySwiper'
                 style={{ width: '100%', height: '100%' }}
             >
                 {images.map((image, i) => (
