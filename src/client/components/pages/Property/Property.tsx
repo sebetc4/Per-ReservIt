@@ -3,30 +3,27 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { Box, Rating, Typography, Grid, Divider, Button, Container } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 
-import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
+import { useAppSelector } from '../../../hooks/redux.hooks';
 import { FacilityItem, Carousel, AccommodationItem } from './components';
 import { KeysOfFacilities } from '../../../../types/properties.types';
-import { setAlert } from '../../../../store/slices/alert.slice';
+import { useAlert } from '../../../hooks/alert.hooks';
 
 interface IProperty {}
 
 export default function Property({}: IProperty) {
-
     // Hooks
-    const dispatch = useAppDispatch();
+    const { setAlert } = useAlert();
 
     // Store
     const { error, data: property } = useAppSelector((state) => state.property);
 
     useEffect(() => {
         error &&
-            dispatch(
-                setAlert({
-                    type: 'error',
-                    message: "Erreur lors de la récupération de l'hébergement. Merci d'essayer ultérieurement.",
-                })
-            );
-    }, [dispatch, error]);
+            setAlert({
+                type: 'error',
+                message: "Erreur lors de la récupération de l'hébergement. Merci d'essayer ultérieurement.",
+            });
+    }, [error]);
 
     // State
     const [selectedAccommodation, setSelectedAccommodation] = useState<number>(0);
@@ -34,6 +31,11 @@ export default function Property({}: IProperty) {
     const handleChangeSelectedAccommodation = (e: ChangeEvent<HTMLInputElement>) => {
         setSelectedAccommodation(+e.target.value);
     };
+
+    useEffect(() => {
+        setAlert({type: 'error', message: 'tesstttt'})
+
+    }, [])
 
     const keysOfFacilities = property ? Object.keys(property.facilities) : null;
 

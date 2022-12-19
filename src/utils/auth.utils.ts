@@ -1,8 +1,8 @@
 import { ToolkitStore } from '@reduxjs/toolkit/dist/configureStore';
 import { GetServerSidePropsContext } from 'next';
 import { getSession } from 'next-auth/react';
-import { setAuthIsChecked, setSessionIsInvalid } from '../store/slices/auth.slice';
-import { setUserData } from '../store/slices/user.slice';
+import { setAuthIsChecked, setInvalidSession } from '../store/slices/auth.slice';
+import { setUserSession } from '../store/slices/user.slice';
 import { SessionStatus } from '../types/api.types';
 
 export const requireAuthUser = async (
@@ -13,8 +13,11 @@ export const requireAuthUser = async (
     store.dispatch(setAuthIsChecked());
     const session = await getSession(context);
     if (session?.status === SessionStatus.VALID) {
-        store.dispatch(setUserData(session.user));
+        store.dispatch(setUserSession(session.user));
         return cb();
+    }
+    if (session) {
+        store.dispatch(setInvalidSession());
     }
     return {
         redirect: {
@@ -38,6 +41,6 @@ export const requireUnauthUser = async (
             },
         };
     }
-    session && store.dispatch(setSessionIsInvalid());
+    session && store.dispatch(setInvalidSession());
     return cb();
 };

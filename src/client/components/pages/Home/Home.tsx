@@ -1,15 +1,16 @@
 import { Box, Container, Grid, Pagination, Typography } from '@mui/material';
 import React, { ChangeEvent, useEffect } from 'react';
-import { setAlert } from '../../../../store/slices/alert.slice';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
 import { propertiesPerPage } from '../../../../utils/constants.utils';
 import { useRouter } from 'next/router';
 import { PropertyCard } from './components';
+import { useAlert } from '../../../hooks/alert.hooks';
 
 export default function Home() {
     // Hooks
     const dispatch = useAppDispatch();
     const router = useRouter();
+    const { setAlert } = useAlert();
 
     // Store
     const { error, data: properties, propertiesCount } = useAppSelector((state) => state.properties);
@@ -20,23 +21,21 @@ export default function Home() {
 
     useEffect(() => {
         error &&
-            dispatch(
-                setAlert({
-                    type: 'error',
-                    message: "Erreur lors de la récupération des hébergements. Merci d'essayer ultérieurement.",
-                })
-            );
-    }, [dispatch, error]);
+            setAlert({
+                type: 'error',
+                message: "Erreur lors de la récupération des hébergements. Merci d'essayer ultérieurement.",
+            });
+    }, [error]);
 
     // Handlers
     const handleChangeCurrentPage = (e: ChangeEvent<unknown>, value: number) => {
-        let query = new URLSearchParams(window.location.search)
+        let query = new URLSearchParams(window.location.search);
         if (query.has('page')) {
-            query.set('page', value.toString())
+            query.set('page', value.toString());
         } else {
-            query.append('page', value.toString())
+            query.append('page', value.toString());
         }
-        router.replace({search: query.toString()})
+        router.replace({ search: query.toString() });
     };
 
     return (

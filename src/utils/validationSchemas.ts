@@ -1,5 +1,12 @@
 import * as yup from 'yup';
-import { Credentials, SignUpBody, UpdateGeneralSettingsBody } from '../types/request.types';
+import {
+    Credentials,
+    ForgotPasswordBody,
+    SignUpBody,
+    UpdateAccountBody,
+    UpdatePasswordBody,
+    UpdateProfileBody,
+} from '../types/request.types';
 
 const usernameValidation = yup
     .string()
@@ -35,7 +42,33 @@ export const signInSchema: yup.SchemaOf<Credentials> = yup.object().shape({
         .max(40, 'Le mot de passe est invalide'),
 });
 
-export const updateGeneralSettingsSchema: yup.SchemaOf<UpdateGeneralSettingsBody> = yup.object().shape({
+export const updateAccountSchema: yup.SchemaOf<UpdateAccountBody> = yup.object().shape({
     username: usernameValidation,
+    email: emailValidation,
+});
+
+export const updateProfileSchema: yup.SchemaOf<UpdateProfileBody> = yup.object().shape({
+    avatar: yup.string(),
+});
+
+export const updatePasswordSchema: yup.SchemaOf<UpdatePasswordBody> = yup.object().shape({
+    currentPassword: yup
+        .string()
+        .required('Mot de passe incorrect')
+        .min(6, 'Mot de passe incorrect')
+        .max(40, 'Mot de passe incorrect'),
+    newPassword: yup
+        .string()
+        .notOneOf([yup.ref('currentPassword')], 'Le nouveau mot de passe doit être diffèrent du mot de passe actuel')
+        .required('Le nouveau mot de passe est requis')
+        .min(6, 'Le mot de passe est invalide')
+        .max(40, 'Le mot de passe est invalide'),
+    confirmPassword: yup
+        .string()
+        .required('La confirmation du mot de passe est requise')
+        .oneOf([yup.ref('newPassword')], 'Les mots de passe ne sont pas identique'),
+});
+
+export const forgotPasswordSchema: yup.SchemaOf<ForgotPasswordBody> = yup.object().shape({
     email: emailValidation,
 });

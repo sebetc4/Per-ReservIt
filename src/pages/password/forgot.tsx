@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { SignUp } from '../../client/components';
+import { ForgotPassword } from '../../client/components';
 import { requireUnauthUser } from '../../utils/auth.utils';
 import { wrapper } from '../../store/store';
 
@@ -9,7 +9,7 @@ export default function SignUpPage() {
             <Head>
                 <title>Inscription - Reserv'It</title>
             </Head>
-            <SignUp />
+            <ForgotPassword />
         </>
     );
 }

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { ObjectId } from 'mongoose';
-import { SignUpBody, UpdateGeneralSettingsBody } from '../types/request.types';
+import { SignUpBody, UpdateAccountBody, UpdatePasswordBody, UpdateProfileBody } from '../types/request.types';
 
 class ApiService {
     api: AxiosInstance;
@@ -30,13 +30,19 @@ class ApiService {
     }
     // User
     signUp(data: SignUpBody) {
-        return this.api.post('/user', data);
+        return this.api.post('/auth/signup', data);
     }
     fetchCurrentUserData() {
         return this.api.get('/user');
     }
-    updateGeneralSettings(data: UpdateGeneralSettingsBody) {
-        return this.api.put('/user/update/generalSettings', data);
+    updateAccount(data: UpdateAccountBody) {
+        return this.api.put('/user/update/account', data);
+    }
+    updateProfile(data: UpdateProfileBody) {
+        return this.api.put('/user/update/profile', data);
+    }
+    updatePassword(data: UpdatePasswordBody) {
+        return this.api.put('/user/update/password', data);
     }
 }
 

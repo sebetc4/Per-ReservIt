@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 type CustomAvatarProps = {
     username: string;
     avatarUrl: string | null;
+    size?: number;
 };
 
 const stringToColor = (string: string) => {
@@ -26,7 +27,7 @@ const getInitials = (name: string) => {
     return initials.toUpperCase();
 };
 
-export default function CustomAvatar({ username, avatarUrl }: CustomAvatarProps) {
+export default function CustomAvatar({ username, avatarUrl, size = 40 }: CustomAvatarProps) {
     const [initials, setInitials] = useState<string>('');
     const [color, setColor] = useState<string>('');
 
@@ -39,8 +40,9 @@ export default function CustomAvatar({ username, avatarUrl }: CustomAvatarProps)
         <Avatar
             alt={`Avatar de ${username}`}
             src={avatarUrl}
+            sx={{ width: size, height: size }}
         />
     ) : (
-        <Avatar sx={{ bgcolor: color }}>{initials}</Avatar>
+        <Avatar sx={{ bgcolor: color, width: size, height: size  }}>{initials}</Avatar>
     );
 }

@@ -3,7 +3,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import nextAuth from 'next-auth';
 
 import dbConnect from '../../../server/config/db.config';
-import { UserWithoutPassword } from '../../../types/user.types';
+import { UserSession } from '../../../types/user.types';
 import { Credentials } from '../../../types/request.types';
 import { handleGoogleProvider } from '../../../server/providers/google.provider';
 import { handleCredentialsProvider } from '../../../server/providers/credentials.provider';
@@ -14,7 +14,7 @@ declare module 'next-auth' {
     interface Session {
         expires: 'string';
         status: SessionStatus
-        user: UserWithoutPassword | null;
+        user: UserSession | null;
     }
 }
 
@@ -58,14 +58,14 @@ export default nextAuth({
 
         session: async ({ session, token }) => {
             dbConnect();
-            const userData = await User.findById(token.sub).select('-password');
-            if (!userData) {
+            const user = await User.findById(token.sub);
+            if (!user) {
                 session.user = null
                 session.status = SessionStatus.INVALID;
                 
             } else {
                 session.status = SessionStatus.VALID;
-                session.user = userData
+                session.user = user.getSession()
             }
             return session;
         },

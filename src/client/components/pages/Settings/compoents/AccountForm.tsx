@@ -1,17 +1,20 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { LoadingButton } from '@mui/lab';
 import { Box, Grid, Container } from '@mui/material';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { updateGeneralSettings } from '../../../../../store/slices/user.slice';
-import { UpdateGeneralSettingsBody } from '../../../../../types/request.types';
-import { updateGeneralSettingsSchema } from '../../../../../utils/validationSchemas';
+import { updateAccount } from '../../../../../store/slices/user.slice';
+import { UpdateAccountBody } from '../../../../../types/request.types';
+import { updateAccountSchema } from '../../../../../utils/validationSchemas';
 import { useAppDispatch, useAppSelector } from '../../../../hooks/redux.hooks';
-import ProgressButton from '../../../buttons/ProgressButton/ProgressButton';
 import CustomTextField from '../../../inputs/CustomTextField/CustomTextField';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import { useAlert } from '../../../../hooks';
 
-export default function GeneralSettingsForm() {
+export default function AccountForm() {
     // Hoohs
     const dispatch = useAppDispatch();
+    const { setAlert } = useAlert();
 
     // Store
     const { data: user } = useAppSelector((state) => state.user);
@@ -20,21 +23,21 @@ export default function GeneralSettingsForm() {
     const {
         register,
         handleSubmit,
-        formState: { isSubmitting, errors },
-        setError,
-    } = useForm<UpdateGeneralSettingsBody>({
-        resolver: yupResolver(updateGeneralSettingsSchema),
+        formState: { errors, isDirty, isSubmitting },
+    } = useForm<UpdateAccountBody>({
+        resolver: yupResolver(updateAccountSchema),
         mode: 'onTouched',
         defaultValues: { username: user!.username, email: user!.email },
     });
 
-    const onSubmit = async (data: UpdateGeneralSettingsBody) => {
-        try {
-            if (user?.email !== data.email || user?.username !== data.username) {
-                dispatch(updateGeneralSettings(data));
+    const onSubmit = async (data: UpdateAccountBody) => {
+        if (user?.email !== data.email || user?.username !== data.username) {
+            const res = await dispatch(updateAccount(data));
+            if (res.meta.requestStatus === 'fulfilled') {
+                setAlert({ type: 'success', message: 'Vos modifications ont été enregistrées.' });
+            } else {
+                setAlert({ type: 'error', message: "Erreur lors de l'enregistrement de vos modifications'. Merci d'essayer ultérieurement." });
             }
-        } catch (err) {
-            console.log(err);
         }
     };
 
@@ -71,17 +74,24 @@ export default function GeneralSettingsForm() {
                     />
                 </Grid>
 
-                <ProgressButton
-                    isLoading={isSubmitting}
-                    disabled={isSubmitting}
+                <LoadingButton
+                    loading={isSubmitting}
+                    disabled={isSubmitting || !isDirty}
+                    size='large'
                     type='submit'
                     variant='contained'
-                    buttonSx={{ marginTop: 4, marginBottom: 2 }}
-                    size='large'
+                    loadingPosition='start'
+                    startIcon={
+                        <SaveOutlinedIcon
+                            fontSize='large'
+                            sx={{ mb: 0.5 }}
+                        />
+                    }
+                    sx={{ marginTop: 4, marginBottom: 2 }}
                     fullWidth
                 >
-                    Modifier
-                </ProgressButton>
+                    Enregistrer les modifications
+                </LoadingButton>
             </Box>
         </Container>
     );

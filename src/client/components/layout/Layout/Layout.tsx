@@ -1,8 +1,9 @@
 import { Box, CircularProgress, Container, Fade } from '@mui/material';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { AlertComponent, Header, Footer } from '../..';
-import { setAlert } from '../../../../store/slices/alert.slice';
-import { CustomError } from '../../../../types/api.types';
+import { logout } from '../../../../store/slices/auth.slice';
+import { SessionStatus } from '../../../../types/api.types';
+import { useAlert } from '../../../hooks';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
 
 type LayoutProps = {
@@ -13,17 +14,21 @@ export default function Layout({ children }: LayoutProps) {
 
     // Hooks
     const dispatch = useAppDispatch();
+    const { setAlert } = useAlert();
 
     // Store
-    const { isChecked: authIsChecked, error: authError } = useAppSelector((state) => state.auth);
+    const { isChecked: authIsChecked, sessionStatus } = useAppSelector((state) => state.auth);
 
     // State
     const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
 
+    // Handle Invalid Session
     useEffect(() => {
-        authError === CustomError.INVALID_TOKEN.message &&
-            dispatch(setAlert({ type: 'error', message: 'Votre session n\'est plus valide. Merci de vous reconnecter.' }));
-    }), [authError];
+        if (sessionStatus === SessionStatus.INVALID) {
+            setAlert({ type: 'error', message: "Votre session n'est plus valide. Merci de vous reconnecter." });
+            dispatch(logout())
+        }
+    });
 
     // Handle body style when toggle showSearchBar
     useEffect(() => {

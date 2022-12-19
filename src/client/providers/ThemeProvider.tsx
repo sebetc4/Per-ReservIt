@@ -1,6 +1,6 @@
 import { createTheme, CssBaseline, GlobalStyles, PaletteMode, ThemeProvider } from '@mui/material';
 import { createContext, ReactNode, useMemo, useState } from 'react';
-import { commonTheme, darkPalette, lightPalette } from '../../theme/theme';
+import { commonTheme, darkPalette, lightPalette } from '../theme/theme';
 
 interface CustomThemeProvider {
     children: ReactNode;

@@ -10,10 +10,11 @@ import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import { GeneralSettingsForm, ProfileForm } from './compoents';
+import { AccountForm, PasswordForm, ProfileForm } from './compoents';
+import { useAppSelector } from '../../../hooks';
 
 type TabType = {
-    label: string;
+    label: 'Général' | 'Profil' | 'Connexion' | 'Adresse';
     icon: SvgIconComponent;
     component: FC;
 };
@@ -22,7 +23,7 @@ const tabs: TabType[] = [
     {
         label: 'Général',
         icon: SettingsOutlinedIcon,
-        component: GeneralSettingsForm,
+        component: AccountForm,
     },
     {
         label: 'Profil',
@@ -32,16 +33,17 @@ const tabs: TabType[] = [
     {
         label: 'Connexion',
         icon: VpnKeyOutlinedIcon,
-        component: GeneralSettingsForm,
+        component: PasswordForm,
     },
     {
-        label: 'Adressse',
+        label: 'Adresse',
         icon: HomeOutlinedIcon,
-        component: GeneralSettingsForm,
+        component: AccountForm,
     },
 ];
 
 export default function Settings() {
+    const { data: user } = useAppSelector((state) => state.user);
     // State
     const [swiper, setSwiper] = useState<ISwiper | null>(null);
     const [currentTab, setCurrentTab] = useState<number>(0);
@@ -78,53 +80,65 @@ export default function Settings() {
                     aria-label='settings tab'
                     sx={{ width: '100%', mt: 4 }}
                 >
-                    {tabs.map((tab, i) => (
-                        <Tab
-                            icon={
-                                <SvgIcon
-                                    component={tab.icon}
-                                    sx={{ mr: 2 }}
+                    {tabs.map((tab, i) => {
+                        if (!(user?.authProvider !== 'credentials' && tab.label === 'Connexion')) {
+                            return (
+                                <Tab
+                                    icon={
+                                        <SvgIcon
+                                            component={tab.icon}
+                                            sx={{ mr: 2 }}
+                                        />
+                                    }
+                                    key={i}
+                                    label={tab.label}
+                                    id={`tab-${i}`}
+                                    iconPosition='start'
+                                    sx={{
+                                        pr: 8,
+                                        justifyContent: 'flex-start',
+                                    }}
+                                    aria-controls={`tabpanel-${i}`}
                                 />
-                            }
-                            key={i}
-                            label={tab.label}
-                            id={`tab-${i}`}
-                            iconPosition='start'
-                            sx={{
-                                pr: 8,
-                                justifyContent: 'flex-start',
-                            }}
-                            aria-controls={`simple-tabpanel-${i}`}
-                        />
-                    ))}
+                            );
+                        } else {
+                            return;
+                        }
+                    })}
                 </Tabs>
             </Box>
             <Container maxWidth='md'>
-                <Box sx={{height: '100%', position: 'relative'}}>
+                <Box sx={{ height: '100%', minHeight: '500px', position: 'relative' }}>
                     <Swiper
                         onSwiper={setSwiper}
                         direction='vertical'
                         allowTouchMove={false}
                         style={{
-                            position:'absolute',
-                            inset: 0
+                            position: 'absolute',
+                            inset: 0,
                         }}
                     >
-                        {tabs.map((tab, i) => (
-                            <SwiperSlide
-                                style={{ display: 'block', width: '100%', height: '100%' }}
-                                key={`slide-${i}`}
-                            >
-                                <Box
-                                    hidden={currentTab !== i}
-                                    id={`tabpanel-${i}`}
-                                    aria-labelledby={`tab-${i}`}
-                                    sx={{ display: 'flex', height: '100%', alignItems: 'center' }}
-                                >
-                                    <tab.component />
-                                </Box>
-                            </SwiperSlide>
-                        ))}
+                        {tabs.map((tab, i) => {
+                            if (!(user?.authProvider !== 'credentials' && tab.label === 'Connexion')) {
+                                return (
+                                    <SwiperSlide
+                                        style={{ display: 'block', width: '100%', height: '100%' }}
+                                        key={`slide-${i}`}
+                                    >
+                                        <Box
+                                            hidden={currentTab !== i}
+                                            id={`tabpanel-${i}`}
+                                            aria-labelledby={`tab-${i}`}
+                                            sx={{ display: 'flex', height: '100%', alignItems: 'center' }}
+                                        >
+                                            <tab.component />
+                                        </Box>
+                                    </SwiperSlide>
+                                );
+                            } else {
+                                return;
+                            }
+                        })}
                     </Swiper>
                 </Box>
             </Container>

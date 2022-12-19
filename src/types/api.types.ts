@@ -36,3 +36,4 @@ export class CustomError {
     static readonly INTERNAL_SERVER_ERROR = new CustomError('Internal server error', 500);
     private constructor(public readonly message: string, public readonly statusCode: number) {}
 }
+

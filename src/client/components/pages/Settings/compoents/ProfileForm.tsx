@@ -1,45 +1,61 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { PhotoCamera } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
 import { Box, Grid, Container, IconButton } from '@mui/material';
-import React, { useState } from 'react';
+import React, { FormEvent, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { updateGeneralSettings } from '../../../../../store/slices/user.slice';
-import { UpdateGeneralSettingsBody } from '../../../../../types/request.types';
-import { updateGeneralSettingsSchema } from '../../../../../utils/validationSchemas';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import { updateProfile } from '../../../../../store/slices/user.slice';
+import { UpdateProfileBody } from '../../../../../types/request.types';
+import { updateProfileSchema } from '../../../../../utils/validationSchemas';
 import { useAppDispatch, useAppSelector } from '../../../../hooks/redux.hooks';
-import ProgressButton from '../../../buttons/ProgressButton/ProgressButton';
 import CustomAvatar from '../../../CustomAvatar/CustomAvatar';
-import CustomTextField from '../../../inputs/CustomTextField/CustomTextField';
+import { useAlert } from '../../../../hooks';
 
 export default function ProfileForm() {
     // Hoohs
     const dispatch = useAppDispatch();
+    const { setAlert } = useAlert();
 
     // Store
-    const { data: user } = useAppSelector((state) => state.user);
+    const { data: user, isLoading } = useAppSelector((state) => state.user);
 
-    const [avatar, setAvatar] = useState(null);
-    const [previewAvatar, setPreviewAvatar] = useState(user?.avatar?.url);
+    const [avatar, setAvatar] = useState<string | ArrayBuffer | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | ArrayBuffer | null>(user!.avatar!.url);
 
     // Form
     const {
         register,
         handleSubmit,
-        formState: { isSubmitting, errors },
+        formState: { isDirty, errors, isSubmitting },
         setError,
-    } = useForm<UpdateGeneralSettingsBody>({
-        resolver: yupResolver(updateGeneralSettingsSchema),
+    } = useForm<UpdateProfileBody>({
+        resolver: yupResolver(updateProfileSchema),
         mode: 'onTouched',
         defaultValues: {},
     });
 
-    const onSubmit = async (data: UpdateGeneralSettingsBody) => {
-        try {
-            if (user?.email !== data.email || user?.username !== data.username) {
-                dispatch(updateGeneralSettings(data));
+    const handleChangeAvatar = (e: FormEvent<HTMLInputElement>) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            if (reader.readyState === 2) {
+                setAvatar(reader.result);
+                setAvatarPreview(reader.result);
             }
-        } catch (err) {
-            console.log(err);
+        };
+        if (!e.currentTarget.files) {
+            return;
+        }
+        reader.readAsDataURL(e.currentTarget.files[0]);
+    };
+    const onSubmit = async (data: UpdateProfileBody) => {
+        if (typeof avatar === 'string') {
+            const res = await dispatch(updateProfile({ ...data, avatar }));
+            if (res.meta.requestStatus === 'fulfilled') {
+                setAlert({ type: 'success', message: 'Vos modifications ont été enregistrées.' });
+                setAvatar(null);
+            } else {
+                setAlert({ type: 'error', message: "Erreur lors de l'enregistrement de vos modifications. Merci d'essayer ultérieurement." });
+            }
         }
     };
 
@@ -59,41 +75,45 @@ export default function ProfileForm() {
                     container
                     spacing={3}
                 >
-                    <Box sx={{width: '100%', display: 'flex', justifyContent: 'center'}}>
-                    <IconButton
-                        color='primary'
-                        aria-label='upload picture'
-                        component='label'
+                    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                        <IconButton
+                            color='primary'
+                            aria-label='upload picture'
+                            component='label'
                         >
-                        <input
-                            hidden
-                            accept='image/*'
-                            type='file'
+                            <input
+                                hidden
+                                onChange={handleChangeAvatar}
+                                accept='image/*'
+                                type='file'
                             />
-                        <CustomAvatar username={user!.username} avatarUrl={user!.avatar.url}/>
-                    </IconButton>
+                            <CustomAvatar
+                                username={user!.username}
+                                avatarUrl={avatarPreview as string}
+                                size={120}
+                            />
+                        </IconButton>
                     </Box>
-                    <CustomTextField
-                        disabled={user?.authProvider !== 'credentials'}
-                        name='email'
-                        label='Adresse e-mail'
-                        type='email'
-                        register={register('email')}
-                        error={errors.email}
-                    />
                 </Grid>
 
-                <ProgressButton
-                    isLoading={isSubmitting}
-                    disabled={isSubmitting}
+                <LoadingButton
+                    size='large'
+                    loading={isSubmitting}
+                    disabled={isSubmitting || (!isDirty && !avatar)}
                     type='submit'
                     variant='contained'
-                    buttonSx={{ marginTop: 4, marginBottom: 2 }}
-                    size='large'
+                    sx={{ marginTop: 4, marginBottom: 2 }}
+                    loadingPosition='start'
+                    startIcon={
+                        <SaveOutlinedIcon
+                            fontSize='large'
+                            sx={{ mb: 0.5 }}
+                        />
+                    }
                     fullWidth
                 >
-                    Modifier
-                </ProgressButton>
+                    Enregistrer les modifications
+                </LoadingButton>
             </Box>
         </Container>
     );

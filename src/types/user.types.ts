@@ -1,22 +1,26 @@
-import { ImageType, InstanceOfWithDates, WithId } from './common.types';
+import { InstanceOfWithDates, WithId } from './common.types';
 
 export type UserSchema = {
-    authProvider: 'credentials' | 'google'
+    authProvider: 'credentials' | 'google';
     username: string;
     email: string;
     password?: string;
-    avatar: AvatarType
+    avatar: AvatarType;
+    resetPasswordToken?: string;
+    resetPasswordExpire?: Date;
 };
 
 export type AvatarType = {
-    url: string | null
-    public_id: string | null
-}
+    url: string | null;
+    public_id: string | null;
+};
 
 export type UserInstance = InstanceOfWithDates<UserSchema> & {
-        isValidPassword: (id: UserSchema['password']) => Promise<boolean>;
-        isEqualValues: (values: Partial<UserSchema>) => boolean;
-    };
+    getSession: () => UserSession;
+    isValidPassword: (id: UserSchema['password']) => Promise<boolean>;
+    isEqualValues: (values: Partial<UserSchema>) => boolean;
+    getResetPasswordToken: () => string
+};
 
-export type User = WithId<UserSchema>
-export type UserWithoutPassword = Omit<User, 'password'>
+export type User = WithId<UserSchema>;
+export type UserSession = Omit<User, 'password' | 'resetPasswordToken' | 'resetPasswordTokenExpire'>;

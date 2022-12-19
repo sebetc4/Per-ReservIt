@@ -1,8 +1,8 @@
 import { Schema, model, models } from 'mongoose';
 import bcrypt from 'bcrypt';
-import { UserSchema } from '../../types/user.types';
+import { UserSchema, UserSession } from '../../types/user.types';
 import { CustomError } from '../../types/api.types';
-import { boolean } from 'yup';
+import crypto from 'crypto'
 
 const UserSchema = new Schema<UserSchema>(
     {
@@ -24,16 +24,20 @@ const UserSchema = new Schema<UserSchema>(
             type: String,
         },
         avatar: {
-            type: {
-                public_id: {
-                    type: String,
-                    default: null
-                },
-                url: {
-                    type: String,
-                    default: null
-                },
+            public_id: {
+                type: String,
+                default: null,
             },
+            url: {
+                type: String,
+                default: null,
+            },
+        },
+        resetPasswordToken: {
+            type: String,
+        },
+        resetPasswordExpire: {
+            type: Date,
         },
     },
     {
@@ -56,6 +60,16 @@ UserSchema.pre('save', async function () {
     }
 });
 
+UserSchema.methods.getSession = function (): UserSession {
+    return {
+        _id: this._id,
+        authProvider: this.authProvider,
+        username: this.username,
+        email: this.email,
+        avatar: this.avatar,
+    };
+};
+
 UserSchema.methods.isValidPassword = async function (password: UserSchema['password']) {
     return await bcrypt.compare(password!, this.password);
 };
@@ -68,5 +82,13 @@ UserSchema.methods.isEqualValues = function (values: Partial<UserSchema>) {
     }
     return true;
 };
+
+UserSchema.methods.getResetPasswordToken = function() {
+    const resetToken = crypto.randomBytes(20).toString('hex')
+    this.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    this.resetPasswordExpire = Date.now() + 15 * 60 * 1000
+    this.save({validateBeforeSave: false})
+    return resetToken
+}
 
 export const User = models.User || model<UserSchema>('User', UserSchema);

@@ -2,23 +2,27 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
-import { Box, Typography, Grid, Container, Button } from '@mui/material';
+import { Box, Typography, Grid, Container } from '@mui/material';
 
 import { useRouter } from 'next/router';
 import { signInSchema } from '../../../../utils/validationSchemas';
-import { CustomPasswordInput, CustomTextField, GoogleButton, ProgressButton } from '../..';
+import { CustomPasswordInput, CustomTextField, GoogleButton } from '../..';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
 import Image from 'next/image';
 import LoginImage from '../../../../../public/images/login-hotel.jpg';
 import { loginWithCredentials, logout } from '../../../../store/slices/auth.slice';
 import { Credentials } from '../../../../types/request.types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { CustomError } from '../../../../types/api.types';
+import { useAlert } from '../../../hooks';
+import { LoadingButton } from '@mui/lab';
 
 export default function Login() {
     // Hooks
     const dispatch = useAppDispatch();
     const router = useRouter();
+    const { setAlert } = useAlert();
+
     const {
         register,
         handleSubmit,
@@ -30,22 +34,17 @@ export default function Login() {
     });
 
     // Store
-    const { isAuth, error } = useAppSelector((state) => state.auth);
+    const { error } = useAppSelector((state) => state.auth);
 
     const [showProviderError, setShowProviderError] = useState<boolean>(false);
 
     const onSubmit = async (data: Credentials) => {
         showProviderError && setShowProviderError(false);
-        dispatch(loginWithCredentials(data));
-    };
-
-    // Handle auth error
-    useEffect(() => {
-        if (error) {
+        const res = await dispatch(loginWithCredentials(data));
+        if (res.meta.requestStatus === 'fulfilled') {
+            router.replace('/');
+        } else {
             switch (error) {
-                case CustomError.INVALID_TOKEN.message:
-                    dispatch(logout());
-                    break;
                 case CustomError.EMAIL_ALREADY_EXISTS.message ||
                     error === CustomError.EMAIL_ALREADY_EXISTS_OTHER_PROVIDER.message:
                     setShowProviderError(true);
@@ -59,17 +58,14 @@ export default function Login() {
                 case CustomError.WRONG_PASSWORD.message:
                     setError('password', { type: 'custom', message: 'Mot de passe invalide' });
                     break;
+                default:
+                    setAlert({
+                        type: 'error',
+                        message: "Erreur lors de la tentative de connecion. Merci d'essayer ultérieurement.",
+                    });
             }
         }
-    }, [error, setError]);
-
-    // // Redirect on success login
-    // useEffect(() => {
-    //     console.log({ isAuth, error });
-    //     if (isAuth && error) {
-    //         router.replace('/');
-    //     }
-    // }, [isAuth, error, router]);
+    };
 
     return (
         <Grid
@@ -139,17 +135,17 @@ export default function Login() {
                                 error={errors.password}
                             />
                         </Grid>
-                        <ProgressButton
-                            isLoading={isSubmitting}
+                        <LoadingButton
+                            loading={isSubmitting}
                             disabled={isSubmitting}
                             type='submit'
                             variant='contained'
-                            buttonSx={{ marginTop: 4, marginBottom: 2 }}
+                            sx={{ marginTop: 4, marginBottom: 2 }}
                             fullWidth
                             size='large'
                         >
                             Se connecter
-                        </ProgressButton>
+                        </LoadingButton>
                         <GoogleButton />
                         {showProviderError && (
                             <Typography
